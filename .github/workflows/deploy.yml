@@ -40,13 +40,22 @@ jobs:
             cd /home/ubuntu/your-project-folder
 
             # Pull the latest code
-            git pull origin main
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/your-username/your-repo.git .
+            else
+              git pull origin main
+            fi
 
             # Install dependencies
             npm install
 
             # Restart the server with PM2
-            pm2 reload all || pm2 start app.js --name "your-app-name"
+            pm2 describe "Node" > /dev/null
+            if [ $? -eq 0 ]; then
+              pm2 reload "Node"
+            else
+              pm2 start app.js --name "Node"
+            fi
 
             # Optional: Log the PM2 status
             pm2 status
