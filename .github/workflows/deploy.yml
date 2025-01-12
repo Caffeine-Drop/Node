@@ -51,7 +51,7 @@ jobs:
               pm2 reload all
             else
               # App is not running, start it
-              pm2 start server.js --name "app.js"
+              pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
             fi
 
             # Optional: Log the PM2 status
