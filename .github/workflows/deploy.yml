@@ -37,25 +37,16 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            cd /home/ubuntu/your-project-folder
+            cd /home/ubuntu/Node
 
             # Pull the latest code
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/your-username/your-repo.git .
-            else
-              git pull origin main
-            fi
+            git pull origin main
 
             # Install dependencies
             npm install
 
             # Restart the server with PM2
-            pm2 describe "Node" > /dev/null
-            if [ $? -eq 0 ]; then
-              pm2 reload "Node"
-            else
-              pm2 start app.js --name "Node"
-            fi
+            pm2 reload all || pm2 start app.js --name "Node"
 
             # Optional: Log the PM2 status
             pm2 status
