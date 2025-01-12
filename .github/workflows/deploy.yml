@@ -45,8 +45,14 @@ jobs:
             # Install dependencies
             npm install
 
-            # Restart the server with PM2
-            pm2 reload all || pm2 start app.js --name "Node"
+            # Check if the app is already running, then reload or start
+            if pm2 describe "app.js" > /dev/null; then
+              # App is already running, reload it
+              pm2 reload all
+            else
+              # App is not running, start it
+              pm2 start app.js --name "app.js"
+            fi
 
             # Optional: Log the PM2 status
             pm2 status
