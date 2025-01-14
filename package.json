@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon -e js, json, prisma --exec \"prisma generate && src/server.js\"",
+    "dev": "nodemon -e js,json,prisma --exec \"prisma generate && node src/server.js\"",
     "seed": "node prisma/seed.js"
   },
   "keywords": [],

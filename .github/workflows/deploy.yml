@@ -37,23 +37,23 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            # 디렉터리 이동
             cd /home/ubuntu/Node
 
-            # Pull the latest code
+            # 최신 풀 받기
             git pull origin main
 
-            # Install dependencies
+            # 의존성 설치
             npm install
 
-            # Check if the app is already running, then reload or start
+            # 실행중이면 무중단, 아니면 시작
             if pm2 describe "app.js" > /dev/null; then
-              # App is already running, reload it
               pm2 reload all
             else
-              # App is not running, start it
               pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
             fi
 
             # Optional: Log the PM2 status
+            pm2 save
             pm2 status
           EOF
