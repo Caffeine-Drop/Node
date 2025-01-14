@@ -66,6 +66,9 @@ jobs:
             # 종속성 설치
             npm install
 
+            # Prisma 마이그레이션 실행
+            npx prisma migrate deploy
+
             # 앱이 실행중이면 리로드, 실행중이 아니면 시작
             if pm2 describe "app.js" > /dev/null; then
               # App is already running, reload it
