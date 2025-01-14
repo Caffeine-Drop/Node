@@ -31,6 +31,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
         run: |
           mkdir -p ~/.ssh
@@ -66,6 +67,9 @@ jobs:
             # 종속성 설치
             npm install
 
+            # Prisma 환경 변수 설정
+            echo "DATABASE_URL=$DATABASE_URL" > .env
+
             # Prisma 마이그레이션 실행
             npx prisma migrate deploy
 
@@ -75,6 +79,8 @@ jobs:
               pm2 reload all
             else
               # App is not running, start it
-              pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
+              pm2 start /home/ubuntu/Node/src/server.js --name "app"
             fi
+
+            pm2 save
           EOF
