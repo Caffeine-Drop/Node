@@ -30,6 +30,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
 
         run: |
           mkdir -p ~/.ssh
@@ -37,15 +38,35 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            # MySQL이 설치되어 있는지 확인하고, 없으면 설치
+            if ! command -v mysql &> /dev/null
+            then
+              echo "MySQL not found. Installing MySQL..."
+              sudo apt-get update
+              sudo apt-get install -y mysql-server
+            else
+              echo "MySQL already installed."
+            fi
+
+            # MySQL 설정 - root 사용자만 접근하도록 설정
+            sudo mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$DB_PASSWORD' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
+            # MySQL 외부 접속 허용 - MySQL 설정 파일 수정
+            sudo sed -i 's/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+            # MySQL 서비스 재시작
+            sudo service mysql restart
+            
+            # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
             cd /home/ubuntu/Node
 
-            # Pull the latest code
+            # 최신 코드 pull
             git pull origin main
 
-            # Install dependencies
+            # 종속성 설치
             npm install
 
-            # Check if the app is already running, then reload or start
+            # 앱이 실행중이면 리로드, 실행중이 아니면 시작
             if pm2 describe "app.js" > /dev/null; then
               # App is already running, reload it
               pm2 reload all
@@ -53,7 +74,4 @@ jobs:
               # App is not running, start it
               pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
             fi
-
-            # Optional: Log the PM2 status
-            pm2 status
           EOF
