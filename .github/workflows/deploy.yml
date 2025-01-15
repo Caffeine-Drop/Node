@@ -48,6 +48,9 @@ jobs:
             # MySQL 루트 비밀번호 환경 변수 설정
             export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 
+            # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
+            cd /home/ubuntu/Node
+
             # Prisma 마이그레이션
             if [ -f "prisma/schema.prisma" ]; then
               echo "Running Prisma migrations..."
@@ -55,9 +58,6 @@ jobs:
             else
               echo "Prisma schema not found. Skipping migrations..."
             fi
-
-            # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
-            cd /home/ubuntu/Node
 
             # 최신 코드 pull
             git pull origin main
