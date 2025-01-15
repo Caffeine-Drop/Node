@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon -e js, json, prisma --exec \"prisma generate && src/server.js\"",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "migrate": "npx prisma migrate dev --name init"
   },
   "keywords": [],
   "author": "",
