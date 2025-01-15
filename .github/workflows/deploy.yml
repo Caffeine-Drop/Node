@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # 배포할 브랜치
+      - main
 
 jobs:
   deploy:
@@ -46,11 +46,11 @@ jobs:
             # 의존성 설치
             npm install
 
-            # 실행중이면 무중단, 아니면 시작
-            if pm2 describe "app.js" > /dev/null; then
-              pm2 reload all
+            # 실행중이면 무중단 재시작, 아니면 시작
+            if pm2 status | grep -q "app.js"; then
+              pm2 reload app.js
             else
-              pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
+              pm2 start /home/ubuntu/Node/src/server.js --name "app.js" --time
             fi
 
             # Optional: Log the PM2 status
