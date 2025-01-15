@@ -51,6 +51,9 @@ jobs:
             # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
             cd /home/ubuntu/Node
 
+            # .env 파일 생성 (Prisma에서 DATABASE_URL을 인식할 수 있도록)
+            echo "DATABASE_URL=$DATABASE_URL" > .env
+
             # Prisma 마이그레이션
             if [ -f "prisma/schema.prisma" ]; then
               echo "Running Prisma migrations..."
