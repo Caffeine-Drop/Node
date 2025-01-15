@@ -46,7 +46,8 @@ jobs:
             fi
 
             # MySQL 루트 비밀번호 환경 변수 설정
-            export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+            export DATABASE_URL="${{ secrets.DATABASE_URL }}"
+            export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
 
             # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
             cd /home/ubuntu/Node
@@ -77,7 +78,7 @@ jobs:
               pm2 reload all
             else
               echo "App is not running, starting it..."
-              pm2 start /home/ubuntu/Node/src/server.js --name "app"
+              pm2 start /home/ubuntu/Node/src/server.js —name "app"
             fi
 
             pm2 save
