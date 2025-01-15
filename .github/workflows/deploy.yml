@@ -54,6 +54,9 @@ jobs:
             # .env 파일 생성 (Prisma에서 DATABASE_URL을 인식할 수 있도록)
             echo "DATABASE_URL=$DATABASE_URL" > .env
 
+            # .env 파일 내용 확인
+            cat .env
+
             # Prisma 마이그레이션
             if [ -f "prisma/schema.prisma" ]; then
               echo "Running Prisma migrations..."
