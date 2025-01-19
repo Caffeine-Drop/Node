@@ -1,6 +1,17 @@
 # Node
 Caffeine Drop Node 리포지토리 입니다.
 
+## 0. 최신 변경사항 불러오기
+
+```
+git stash // 현재 변경사항 임시 저장하기
+git fetch origin // 최신 변경사항 가져오기
+git branch // 현재 어떤 브랜치에 있는지 확인하세요!!
+git merge origin/develop // develop 브랜치 최신 변경사항을 머지합니다.
+```
+이렇게 하면 프로젝트의 최신 변경사항을 유지할 수 있습니다.
+만약 충돌이 나는 경우 적절히 처리하세요. (혹은 팀장 부르기)
+
 ## 1. 폴더 구조
 
 ```
