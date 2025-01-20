@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import responseMiddleware from "./middlewares/responseMiddleware.js";
 import { NotFoundError } from "./error/error.js";
 import { getBeanDetail } from "./controllers/bean_controller.js";
 import { handleCafeBean } from "./controllers/cafe_controller.js";
@@ -15,27 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 표준 응답 미들웨어
-app.use((req, res, next) => {
-  // 성공 응답 메서드 추가
-  res.success = (data, status = 200) => {
-	res.status(status).json({
-	  success: true,
-	  error: null,
-	  data
-	});
-  };
-  
-  // 오류 응답 메서드 추가
-  res.error = (error, status = 400) => {
-	res.status(status).json({
-	  success: false,
-	  name: error.name || 'Error',
-	  message: error.message || 'An unexpected error occurred',
-	});
-  };
-  
-  next();
-});
+app.use(responseMiddleware);
 
 app.get("/", (req, res) => {
 	res.send("Hello, Express!");
