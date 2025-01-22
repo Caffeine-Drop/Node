@@ -1,4 +1,5 @@
-import prisma from '../../prisma';
+import prisma from '../../prisma/schema.prisma';
+import { elasticsearchClient } from '../elasticsearch';
 
 class SearchRepository {
   // 단어별 검색 수 증가
@@ -37,16 +38,20 @@ class SearchRepository {
   }
 
   // 키워드로 검색
-  static async searchCafesByKeyword(keyword) {
-    return prisma.cafe.findMany({
-      where: {
-        OR: [
-          { name: { contains: keyword, mode: 'insensitive' } },
-          { menu_items: { some: { name: { contains: keyword, mode: 'insensitive' } } } },
-          { address: { contains: keyword, mode: 'insensitive' } },
-        ],
+  async searchCafesByKeyword(keyword) {
+    const result = await elasticsearchClient.search({
+      index: 'cafes',
+      body: {
+        query: {
+          multi_match: {
+            query: keyword,
+            fields: ['name', 'menu_items', 'address'],
+          },
+        },
       },
     });
+
+    return result.hits.hits.map((hit) => hit._source);
   }
 }
 

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import syncCafesToElasticsearch from './elasticsearch.js';
 
 const app = express();
 
@@ -11,6 +12,13 @@ app.use(express.static("public"));
 app.use(express.json());
 // URL 인코딩 미들웨어
 app.use(express.urlencoded({ extended: true }));
+
+// 서버 시작 시 ElasticSearch 동기화 실행
+syncCafesToElasticsearch().then(() => {
+  console.log('엘라스틱서치 동기화 성공');
+}).catch((error) => {
+  console.error('엘라스틱서치 동기화 중 에러:', error);
+});
 
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
