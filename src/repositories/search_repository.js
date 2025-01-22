@@ -3,6 +3,7 @@ import { elasticsearchClient } from '../elasticsearch';
 
 class SearchRepository {
   // 단어별 검색 수 증가
+  // 단어가 없다면 생성 후 추가, 있다면 증가
   static async incrementSearchCount(keyword) {
     const existingTerm = await prisma.searchTerm.findUnique({
       where: { term: keyword },
@@ -37,7 +38,7 @@ class SearchRepository {
     });
   }
 
-  // 키워드로 검색
+  // 키워드 검색 - 한국어 최적화
   async searchCafesByKeyword(keyword) {
     const result = await elasticsearchClient.search({
       index: 'cafes',

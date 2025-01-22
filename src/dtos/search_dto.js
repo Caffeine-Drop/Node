@@ -1,3 +1,4 @@
+// 카페 정보 반환 DTO
 class CafeResponseDTO {
   constructor(
     name, latitude, longitude, address, operatingHours,
