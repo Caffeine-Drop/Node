@@ -136,7 +136,7 @@ model RecentSearch {
 
 model Owner {
   owner_id           Int               @id @default(autoincrement())
-  user               User              @relation(fields: [user_id], references: [user_id])
+  user               User?             @relation(fields: [user_id], references: [user_id])
   user_id            Int               @unique
   cafe               Cafe[]
   cafe_id            Int               @unique
@@ -239,4 +239,13 @@ model Roasting {
   description        String?
   beans              Bean[]
   prefered_beans     PreferedUserBean[]
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.VarChar(512)
+  expiresAt DateTime @map("expires_at")
+
+  @@map("session")
 }
