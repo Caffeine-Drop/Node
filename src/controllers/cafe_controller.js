@@ -4,7 +4,7 @@ import { readCafeInfos } from '../services/cafe_service.js';
 export const handleReadCafes = async (req, res, next) => {
   try {
     const cafeId = parseInt(req.params.cafe_id);
-    // console.log(cafeId);
+    console.log(cafeId);
     // cafeId가 유효한지 체크
     if (isNaN(cafeId)) {
       return res.status(400).json({ error: 'Invalid cafeId' });

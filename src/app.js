@@ -1,39 +1,40 @@
-import express from "express";
-import cors from "cors";
-
+import express from 'express';
+import cors from 'cors';
+import { handleReadCafes } from './controllers/cafe_controller.js';
 const app = express();
 
 // CORS 미들웨어
 app.use(cors());
 // 정적 파일 제공 미들웨어
-app.use(express.static("public"));
+app.use(express.static('public'));
 // JSON 파싱 미들웨어
 app.use(express.json());
 // URL 인코딩 미들웨어
 app.use(express.urlencoded({ extended: true }));
 
 // 표준 응답 미들웨어
-app.use(responseMiddleware);
+// app.use(responseMiddleware);
 
-app.get("/", (req, res) => {
-	res.send("Hello, Express!");
+app.get('/', (req, res) => {
+  res.send('Hello, Express!');
 });
+app.get('/cafes/:cafe_id', handleReadCafes);
 
 // 404 처리
 app.use((req, res, next) => {
-	throw new NotFoundError("The requested resource was not found");
+  throw new NotFoundError('The requested resource was not found');
 });
 
 // 에러 처리 미들웨어
 app.use((err, req, res, next) => {
-	// 사용자 정의 에러 처리
-	if (err.name && err.message) {
-		return res.error(err, err.status || 400);
-	}
+  // 사용자 정의 에러 처리
+  if (err.name && err.message) {
+    return res.error(err, err.status || 400);
+  }
 
-	// 기타 에러 처리
-	console.error(err);
-	res.error(new Error("Internal server error"), 500);
+  // 기타 에러 처리
+  console.error(err);
+  res.error(new Error('Internal server error'), 500);
 });
 
 export default app;
