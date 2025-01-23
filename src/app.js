@@ -1,9 +1,6 @@
 import express from "express";
 import cors from "cors";
-import responseMiddleware from "./middlewares/responseMiddleware.js";
-import { NotFoundError } from "./error/error.js";
-import { getBeanDetail } from "./controllers/bean_controller.js";
-import { handleCafeBean } from "./controllers/cafe_controller.js";
+
 const app = express();
 
 // CORS 미들웨어
@@ -22,30 +19,21 @@ app.get("/", (req, res) => {
 	res.send("Hello, Express!");
 });
 
-
-// 원두 상세조회 API 
-app.get("/beans/:bean_id", getBeanDetail);
-
-// 카페 보유원두 추가 API
-app.post("/cafes/:cafe_id/beans/:bean_id", handleCafeBean);
-
-
-
 // 404 처리
 app.use((req, res, next) => {
-  throw new NotFoundError("The requested resource was not found");
+	throw new NotFoundError("The requested resource was not found");
 });
 
 // 에러 처리 미들웨어
 app.use((err, req, res, next) => {
-  // 사용자 정의 에러 처리
-  if (err.name && err.message) {
-	return res.error(err, err.status || 400);
-  }
+	// 사용자 정의 에러 처리
+	if (err.name && err.message) {
+		return res.error(err, err.status || 400);
+	}
 
-  // 기타 에러 처리
-  console.error(err);
-  res.error(new Error("Internal server error"), 500);
+	// 기타 에러 처리
+	console.error(err);
+	res.error(new Error("Internal server error"), 500);
 });
 
 export default app;

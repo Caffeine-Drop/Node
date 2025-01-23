@@ -1,5 +1,3 @@
-import { StatusCodes } from "http-status-codes";
-
 import { findBeanByID } from "../services/bean_service.js";
 
 // 원두 상세조회 API
