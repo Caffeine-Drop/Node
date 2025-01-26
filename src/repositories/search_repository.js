@@ -1,5 +1,7 @@
-import prisma from '../../prisma/schema.prisma';
 import { elasticsearchClient } from '../elasticsearch';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 class SearchRepository {
   // 단어별 검색 수 증가

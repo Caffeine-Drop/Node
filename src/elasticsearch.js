@@ -1,5 +1,7 @@
 import { Client } from '@elastic/elasticsearch';
-import { prisma } from '../prisma/schema.prisma';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const elasticsearchClient = new Client({
   node: 'http://localhost:9200',

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import syncCafesToElasticsearch from './elasticsearch.js';
+import { syncCafesToElasticsearch } from './elasticsearch.js';
+import responseMiddleware from './middlewares/responseMiddleware.js';
 
 const app = express();
 
