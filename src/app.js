@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { syncCafesToElasticsearch } from './elasticsearch.js';
 import responseMiddleware from './middlewares/responseMiddleware.js';
+import searchMiddleware from './middlewares/search_route.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ syncCafesToElasticsearch().then(() => {
 
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
+app.use('/search', searchMiddleware);
 
 app.get("/", (req, res) => {
 	res.send("Hello, Express!");
