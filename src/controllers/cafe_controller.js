@@ -1,9 +1,8 @@
-import { makeCafeBean, getBeans, getAllOfBeans, isSpecial} from "../services/cafe_service.js";
+import { makeCafeBean, getAllOfBeans, isSpecial} from "../services/cafe_service.js";
 import { cafeBeanDto } from "../dtos/cafebean_dto.js";
 
+// 카페 보유원두 추가 컨트롤러
 export const handleCafeBean = async (req, res, next) => {
-  //요청 파라미터 확인
-  console.log("body:", req.body, "\nparams:", req.params, "\nquery:", req.query);
   try{
     const cafebean = await makeCafeBean(cafeBeanDto(req.params));
     res.status(200).success(cafebean);
@@ -12,18 +11,8 @@ export const handleCafeBean = async (req, res, next) => {
   }
 }
 
-export const getCafeBeans = async (req, res, next) => {
-  try{
-    const beans = await getBeans(Number(req.params.cafe_id));
-    res.status(200).success(beans);
-  }catch(err){
-    next(err);
-  }
-}
-
+// 카페 원두 상세조회(전체) 컨트롤러
 export const getCafeBeansDetails = async (req, res, next) => {
-  //요청 파라미터 확인
-  console.log("body:", req.body, "\nparams:", req.params, "\nquery:", req.query);
   try{
     const beans = await getAllOfBeans(Number(req.params.cafe_id));
     res.status(200).success(beans);
@@ -32,9 +21,8 @@ export const getCafeBeansDetails = async (req, res, next) => {
   }
 }
 
+// 스페셜티 인증 커피 보유여부 컨트롤러
 export const hasSpecialTea = async (req, res, next) => {
-  //요청 파라미터 확인
-  console.log("body:", req.body, "\nparams:", req.params, "\nquery:", req.query);
   try{
     const result = await isSpecial(Number(req.params.cafe_id));
     res.status(200).success(result);
