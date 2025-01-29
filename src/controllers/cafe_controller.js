@@ -1,4 +1,4 @@
-import { makeCafeBean, getBeans, isSpecial} from "../services/cafe_service.js";
+import { makeCafeBean, getBeans, getAllOfBeans, isSpecial} from "../services/cafe_service.js";
 import { cafeBeanDto } from "../dtos/cafebean_dto.js";
 
 export const handleCafeBean = async (req, res, next) => {
@@ -13,10 +13,19 @@ export const handleCafeBean = async (req, res, next) => {
 }
 
 export const getCafeBeans = async (req, res, next) => {
+  try{
+    const beans = await getBeans(Number(req.params.cafe_id));
+    res.status(200).success(beans);
+  }catch(err){
+    next(err);
+  }
+}
+
+export const getCafeBeansDetails = async (req, res, next) => {
   //요청 파라미터 확인
   console.log("body:", req.body, "\nparams:", req.params, "\nquery:", req.query);
   try{
-    const beans = await getBeans(Number(req.params.cafe_id));
+    const beans = await getAllOfBeans(Number(req.params.cafe_id));
     res.status(200).success(beans);
   }catch(err){
     next(err);
