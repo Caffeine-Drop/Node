@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import { handleReadCafes } from './controllers/cafe_controller.js';
+import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
+import responseMiddleware from './middlewares/responseMiddleware.js';
+
 const app = express();
 
 // CORS 미들웨어
@@ -13,12 +15,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 표준 응답 미들웨어
-// app.use(responseMiddleware);
+app.use(responseMiddleware);
+// 카페 전체정보 조회 미들웨어
+app.use(cafeCheckMiddleware);
 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
-app.get('/cafes/:cafe_id', handleReadCafes);
 
 // 404 처리
 app.use((req, res, next) => {
