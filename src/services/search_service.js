@@ -1,6 +1,6 @@
 import { InternalServerError, NotFoundError } from '../error/error.js';
 
-class searchService {
+class SearchService {
     constructor(searchRepository) {
         this.searchRepository = searchRepository;
     }
@@ -98,4 +98,4 @@ class searchService {
     }
 }
 
-export default searchService;
+export default SearchService;
