@@ -22,7 +22,8 @@ class searchController {
             const result = await service.searchCafes(user_id, keyword);
             return res.status(200).json({
                 message: '검색 완료',
-                term : result,
+                term : keyword,
+                list : result,
             });
         } catch (error) {
             if (error instanceof NotFoundError) {
