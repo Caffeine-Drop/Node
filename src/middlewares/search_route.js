@@ -10,7 +10,5 @@ router.get('/', authenticateToken, controller.searchByKeyword);
 router.get('/recent', authenticateToken, controller.getRecentTerms);
 router.delete('/recent/delete', authenticateToken, controller.deleteSearchTerm);
 router.delete('/recent/delete/all', authenticateToken, controller.deleteAllSearchTerms);
-// router.post('/', controller.sort); // 정렬 기준 변경
-
 
 export default router;
