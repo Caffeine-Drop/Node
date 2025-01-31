@@ -8,7 +8,7 @@ const service = new SearchService(searchRepository);
 class SearchController {
     async searchByKeyword(req, res, next) {
         const user_id = req.user_id;
-        const { keyword } = req.query;
+        const { keyword, lat, lng, radius } = req.query;
 
         if (!user_id || isNaN(user_id)) {
             return res.status(400).json({ message: '유저 아이디는 필수이며 숫자여야 합니다.' });
@@ -16,6 +16,14 @@ class SearchController {
 
         if (!keyword || keyword.trim().length === 0) {
             return res.status(400).json({ message: '검색어는 필수입니다.' });
+        }
+
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            return res.status(400).json({ message: '위도와 경도는 필수이며 숫자여야 합니다.' });
+        }
+    
+        if (!radius || isNaN(radius)) {
+            return res.status(400).json({ message: '반경은 필수이며 숫자여야 합니다.' });
         }
 
         try {

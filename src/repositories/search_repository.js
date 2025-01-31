@@ -66,15 +66,30 @@ class SearchRepository {
     console.log(`${keyword} : ${user_id} 개인 검색어 저장 완료`);
   }
 
-  // 키워드 검색 - 한국어 최적화
-  async searchCafesByKeyword(keyword) {
+  // 키워드 검색 - 한국어 최적화 및 검색 반경 설정
+  async searchCafesByKeyword(keyword, lat, lng, radius) {
     const result = await elasticsearchClient.search({
       index: 'cafes',
       body: {
         query: {
-          multi_match: {
-            query: keyword,
-            fields: ['name', 'menu_items', 'address'],
+          bool: {
+            must: [
+              {
+                multi_match: {
+                  query: keyword,
+                  fields: ['name', 'menu_items', 'address'],
+                },
+              },
+            ],
+            filter: {
+              geo_distance: {
+                distance: `${radius}km`,
+                location: {
+                  lat: parseFloat(lat),
+                  lon: parseFloat(lng),
+                },
+              },
+            },
           },
         },
       },
