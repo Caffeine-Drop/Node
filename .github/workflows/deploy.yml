@@ -39,21 +39,35 @@ jobs:
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /home/ubuntu/Node
 
-            # Pull the latest code
+            # 최신 코드 pull
             git pull origin main
 
-            # Install dependencies
+            # 의존성 설치
             npm install
 
-            # Check if the app is already running, then reload or start
+            # mysql 실행 확인 (안되어 있으면 시작)
+            if systemctl is-active --quiet mysql; then
+              echo "MySQL is running."
+            else
+              echo "MySQL is not running. Starting MySQL..."
+              sudo systemctl start mysql
+            fi
+
+            # elasticsearch 실행 확인 (안되어 있으면 시작)
+            if systemctl is-active --quiet elasticsearch; then
+              echo "Elasticsearch is running."
+            else
+              echo "Elasticsearch is not running. Starting Elasticsearch..."
+              sudo systemctl start elasticsearch
+            fi
+
+            # app 실행 확인 (안되어 있으면 시작) & 무중단 배포
             if pm2 describe "app.js" > /dev/null; then
-              # App is already running, reload it
               pm2 reload all
             else
-              # App is not running, start it
               pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
             fi
 
-            # Optional: Log the PM2 status
+            # 무중단 배포 pm2 확인
             pm2 status
           EOF
