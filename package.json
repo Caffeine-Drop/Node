@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon -e js, json, prisma --exec \"prisma generate && src/server.js\"",
+    "dev": "nodemon -e js, json, prisma --exec \"prisma generate && node src/server.js\"",
     "seed": "node prisma/seed.js",
     "migrate": "npx prisma migrate dev --name init"
   },
@@ -14,6 +14,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.17.0",
     "@prisma/client": "^6.2.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
@@ -22,5 +23,9 @@
     "nodemon": "^3.1.9",
     "prisma": "^6.2.1",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0"
   }
 }
