@@ -1,12 +1,12 @@
 import { InternalServerError, NotFoundError } from '../error/error.js';
 
-class searchService {
+class SearchService {
     constructor(searchRepository) {
         this.searchRepository = searchRepository;
     }
     
     // 카페 검색
-    async searchCafes(user_id, keyword) {         
+    async searchCafes(user_id, keyword, lat, lng, radius) {         
         try {
             const user = await this.userRepository.findById(user_id);
             if (!user) {
@@ -15,7 +15,7 @@ class searchService {
 
             this.searchRepository.incrementSearchCount(keyword); // 키워드 카운트 증가
             await this.searchRepository.saveRecentSearch(user_id, keyword); // 최근 검색어 저장
-            const cafes = await this.searchRepository.searchCafesByKeyword(keyword); // 키워드로 검색
+            const cafes = await this.searchRepository.searchCafesByKeyword(keyword, lat, lng, radius); // 키워드로 검색
 
             const cafeResponseDTOs = cafes.map(cafe => new CafeResponseDTO(
                 cafe.name,
@@ -98,4 +98,4 @@ class searchService {
     }
 }
 
-export default searchService;
+export default SearchService;
