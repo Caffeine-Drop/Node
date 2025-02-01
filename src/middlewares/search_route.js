@@ -1,15 +1,14 @@
 import express from 'express';
-import searchController from '../controllers/search_controller.js';
+import SearchController from '../controllers/search_controller.js';
+import { authenticateToken } from './authMiddleware.js';
 
 const router = express.Router();
-const controller = new searchController();
+const controller = new SearchController();
 
-router.get('/rank', controller.getTopSearchTerms);
-router.get('/:user_id', controller.searchByKeyword);
-router.get('/recent/:user_id', controller.getRecentTerms);
-router.delete('/recent/:user_id/delete', controller.deleteSearchTerm);
-router.delete('/recent/:user_id/delete/all', controller.deleteAllSearchTerms);
-// router.post('/', controller.sort); // 정렬 기준 변경
-
+router.get('/rank', authenticateToken, controller.getTopSearchTerms);
+router.get('/', authenticateToken, controller.searchByKeyword);
+router.get('/recent', authenticateToken, controller.getRecentTerms);
+router.delete('/recent/delete', authenticateToken, controller.deleteSearchTerm);
+router.delete('/recent/delete/all', authenticateToken, controller.deleteAllSearchTerms);
 
 export default router;

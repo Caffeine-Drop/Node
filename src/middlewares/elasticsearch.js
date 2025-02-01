@@ -11,13 +11,12 @@ export const elasticsearchClient = new Client({
   },
 });
 
-export async function syncCafesToElasticsearch() {
+export default async function syncCafesToElasticsearch() {
     try {
       // MySQL에서 모든 카페 데이터 가져오기
       const cafes = await prisma.cafe.findMany();
   
       if (cafes.length === 0) {
-        console.log('No cafes found to sync.');
         return;
       }
   
@@ -32,11 +31,10 @@ export async function syncCafesToElasticsearch() {
             address: cafe.address,
           },
         });
-        console.log(`Synced cafe: ${cafe.name}`);
       }
   
-      console.log('ElasticSearch sync completed successfully!');
+      console.log('엘라스틱서치 동기화 성공');
     } catch (error) {
-      console.error('Error during ElasticSearch sync:', error);
+      console.error('엘라스틱서치 동기화 중 에러 : ', error);
     }
 }
