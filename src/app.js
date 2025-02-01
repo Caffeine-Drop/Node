@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import syncCafesToElasticsearch from './middlewares/elasticsearch.js';
 import responseMiddleware from './middlewares/responseMiddleware.js';
 import searchMiddleware from './middlewares/search_route.js';
 import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
@@ -16,8 +15,6 @@ app.use(express.json());
 // URL 인코딩 미들웨어
 app.use(express.urlencoded({ extended: true }));
 
-// 서버 시작 시 ElasticSearch 동기화 실행
-app.use(syncCafesToElasticsearch);
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
 // 카페 전체정보 조회 미들웨어
