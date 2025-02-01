@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { syncCafesToElasticsearch } from "./elasticsearch.js";
+import syncCafesToElasticsearch from "./middlewares/elasticsearch.js";
 import responseMiddleware from "./middlewares/responseMiddleware.js";
 import searchMiddleware from "./middlewares/search_route.js";
 import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
@@ -17,19 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 서버 시작 시 ElasticSearch 동기화 실행
-syncCafesToElasticsearch()
-	.then(() => {
-		console.log("엘라스틱서치 동기화 성공");
-	})
-	.catch((error) => {
-		console.error("엘라스틱서치 동기화 중 에러:", error);
-	});
-
+app.use(syncCafesToElasticsearch);
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
 // 카페 전체정보 조회 미들웨어
 app.use(cafeCheckMiddleware);
-// 검색 미들웨어
+// 검색 관련 API 미들웨어
 app.use("/search", searchMiddleware);
 
 app.get("/", (req, res) => {
