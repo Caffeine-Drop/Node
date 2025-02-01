@@ -1,4 +1,4 @@
-import { handleCafeBean, getCafeBeansDetails, hasSpecialTea } from "../controllers/cafe_controller.js";
+import { handleCafeBean, getCafeBeansDetails, hasSpecialTea } from "../controllers/cafeBean_controller.js";
 import { Router } from "express";
 
 const router = Router();
@@ -11,6 +11,5 @@ router.get("/cafes/:cafe_id/specialty", hasSpecialTea);
 
 // 카페 보유원두 추가 API
 router.post("/cafes/:cafe_id/beans/:bean_id", handleCafeBean);
-
 
 export default router;

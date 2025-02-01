@@ -1,4 +1,3 @@
-
 import * as Error from '../error/error.js';
 import { addCafeBean, getCafeBeanByKey, getBeansByCafeID } from '../repositories/cafebean_repository.js';
 import { getCafe } from '../repositories/cafe_repository.js';
@@ -11,11 +10,11 @@ export const makeCafeBean = async (data) => {
     const comfirm2 = await getBean(data.bean_id);
     const comfirm3 = await getCafeBeanByKey(data);
     // 요청 데이터 존재여부 확인
-    if(!comfirm1 || !comfirm2){
+    if (!comfirm1 || !comfirm2) {
       throw new Error.NotFoundError((comfirm1 ? "원두" : "카페") + "를 찾을 수 없습니다.");
     }
     // 이미 등록된 데이터인지 확인
-    if(comfirm3){
+    if (comfirm3) {
       throw new Error.ValidationError("이미 등록된 카페와 원두입니다.");
     }
         
@@ -24,9 +23,9 @@ export const makeCafeBean = async (data) => {
     return result;
 
   } catch (err) {
-    if(err instanceof Error.AppError){
+    if (err instanceof Error.AppError) {
       throw err;
-    }else{
+    } else {
       throw new Error.InternalServerError();
     }
   }
@@ -37,7 +36,7 @@ export const getAllOfBeans = async (cafe_id) => {
   try {
     const comfirm = await getCafe(cafe_id);
     // 카페 존재여부 확인
-    if(!comfirm){
+    if (!comfirm) {
       throw new Error.NotFoundError("카페를 찾을 수 없습니다.");
     }
 
@@ -54,9 +53,9 @@ export const getAllOfBeans = async (cafe_id) => {
     return { bean: beansDetail, single_origin: singleDetails, bean_tag: tagIDs, cuffingTag: cuffingTag };
 
   } catch (err) {
-    if(err instanceof Error.AppError){
+    if (err instanceof Error.AppError) {
       throw err;
-    }else{
+    } else {
       throw new Error.InternalServerError();
     }
   }
@@ -67,18 +66,18 @@ export const isSpecial = async (cafe_id) => {
   try {
     const comfirm = await getCafe(cafe_id);
     // 카페 존재여부 확인
-    if(!comfirm){
+    if (!comfirm) {
       throw new Error.NotFoundError("카페를 찾을 수 없습니다.");
     }
 
     const beans = await getBeansByCafeID(cafe_id);    // 보유원두 id 리스트
     const result = await getSingleOriginID(beans.map((bean) => bean.bean_id)); // 싱글오리진 원두 id 리스트
 
-    return result.length==0 ? false : true;
+    return result.length == 0 ? false : true;
   } catch (err) {
-    if(err instanceof Error.AppError){
+    if (err instanceof Error.AppError) {
       throw err;
-    }else{
+    } else {
       throw new Error.InternalServerError();
     }
   }

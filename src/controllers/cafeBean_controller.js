@@ -1,5 +1,5 @@
-import { makeCafeBean, getAllOfBeans, isSpecial} from "../services/cafe_service.js";
-import { cafeBeanDto } from "../dtos/cafebean_dto.js";
+import { makeCafeBean, getAllOfBeans, isSpecial} from "../services/cafeBean_service.js";
+import { cafeBeanDto } from "../dtos/bean_dto.js";
 
 // 카페 보유원두 추가 컨트롤러
 export const handleCafeBean = async (req, res, next) => {
