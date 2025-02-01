@@ -5,10 +5,10 @@ import { InternalServerError, NotFoundError } from '../error/error.js';
 const searchRepository = new SearchRepository();
 const service = new SearchService(searchRepository);
 
-class searchController {
+class SearchController {
     async searchByKeyword(req, res, next) {
-        const { user_id } = req.params;
-        const { keyword } = req.query;
+        const user_id = req.user_id;
+        const { keyword, lat, lng, radius } = req.query;
 
         if (!user_id || isNaN(user_id)) {
             return res.status(400).json({ message: '유저 아이디는 필수이며 숫자여야 합니다.' });
@@ -18,11 +18,20 @@ class searchController {
             return res.status(400).json({ message: '검색어는 필수입니다.' });
         }
 
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            return res.status(400).json({ message: '위도와 경도는 필수이며 숫자여야 합니다.' });
+        }
+    
+        if (!radius || isNaN(radius)) {
+            return res.status(400).json({ message: '반경은 필수이며 숫자여야 합니다.' });
+        }
+
         try {
             const result = await service.searchCafes(user_id, keyword);
             return res.status(200).json({
                 message: '검색 완료',
-                term : result,
+                term : keyword,
+                list : result,
             });
         } catch (error) {
             if (error instanceof NotFoundError) {
@@ -64,7 +73,7 @@ class searchController {
     }
 
     async getRecentTerms(req, res, next) {
-        const { user_id } = req.params;
+        const user_id = req.user_id;
 
         if (!user_id || isNaN(user_id)) {
             return res.status(400).json({ message: '유저아이디는 필수이며 숫자여야 합니다.' });
@@ -90,19 +99,19 @@ class searchController {
     }
 
     async deleteSearchTerm(req, res, next) {
-        const { user_id } = req.params;
-        const { term } = req.query;
+        const user_id = req.user_id;
+        const { keyword } = req.query;
 
         if (!user_id || isNaN(user_id)) {
             return res.status(400).json({ message: '유저아이디는 필수이며 숫자여야 합니다.' });
         }
 
-        if (!term || term.trim().length === 0) {
+        if (!keyword || keyword.trim().length === 0) {
             return res.status(400).json({ message: '검색어는 필수입니다.' });
         }
     
         try {
-            const result = await service.deleteRecentSearch(user_id, term);
+            const result = await service.deleteRecentSearch(user_id, keyword);
             return res.status(200).json({
                 message: '유저별 최근 검색어 삭제 완료 (1개)',
                 deleteTerm: result,
@@ -121,7 +130,7 @@ class searchController {
     }
     
     async deleteAllSearchTerms(req, res, next) {
-        const { user_id } = req.params;
+        const user_id = req.user_id;
 
         if (!user_id || isNaN(user_id)) {
             return res.status(400).json({ message: '유저아이디는 필수이며 숫자여야 합니다.' });
@@ -146,4 +155,4 @@ class searchController {
     }
 }
 
-export default searchController;
+export default SearchController;
