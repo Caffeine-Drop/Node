@@ -1,5 +1,6 @@
 import { makePreferredBean, findPreferredBean, deleteUserPreference } from '../services/preference_service.js';
 import { responseToPreffedBean, preferredBeanDto } from '../dtos/bean_dto.js';
+import * as Error from '../error/error.js';
 
 // 선호원두 추가 컨트롤러
 export const handlePreferredBean = async(req, res, next) => {
@@ -7,7 +8,13 @@ export const handlePreferredBean = async(req, res, next) => {
     const preferredBean = await makePreferredBean(responseToPreffedBean({ params: req.params, body: req.body }));
     res.status(200).success(preferredBean);
   } catch (err) {
-    next(err);
+    if(err instanceof Error.NotFoundError){
+      res.error(err, 404);
+    }else if(err instanceof Error.InternalServerError){
+      res.error(err, 500);
+    }else{
+      next(err);
+    }
   }
 }
 
@@ -17,7 +24,13 @@ export const getPreferredBeanDetail = async(req, res, next) => {
     const preferredBean = await findPreferredBean(Number(req.params.user_id));
     res.status(200).success(preferredBean);
   } catch (err) {
-    next(err);
+    if(err instanceof Error.NotFoundError){
+      res.error(err, 404);
+    }else if(err instanceof Error.InternalServerError){
+      res.error(err, 500);
+    }else{
+      next(err);
+    }
   }
 }
 
@@ -28,6 +41,14 @@ export const removePreferredBean = async(req, res, next) => {
     console.log(preferredBean);
     res.status(200).success(preferredBean);
   } catch (err) {
-    next(err);
+    if(err instanceof Error.NotFoundError){
+      res.error(err, 404);
+    }else if(err instanceof Error.ForbiddenError){
+      res.error(err, 403);
+    }else if(err instanceof Error.InternalServerError){
+      res.error(err, 500);
+    }else{
+      next(err);
+    }
   }
 }
