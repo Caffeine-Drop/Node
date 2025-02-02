@@ -4,6 +4,7 @@ import responseMiddleware from './middlewares/responseMiddleware.js';
 import searchMiddleware from './middlewares/search_route.js';
 import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
 
+
 const app = express();
 
 // CORS 미들웨어

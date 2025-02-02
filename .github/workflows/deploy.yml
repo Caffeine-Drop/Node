@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # 배포할 브랜치
+      - main
 
 jobs:
   deploy:
@@ -22,14 +22,13 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # - name: Run Tests
-      #   run: npm test
-
       - name: SSH to EC2 and Deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
 
         run: |
           mkdir -p ~/.ssh
@@ -37,37 +36,50 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            # MySQL이 설치되어 있지 않으면 설치
+            if ! command -v mysql &> /dev/null
+            then
+              echo "MySQL not found. Installing MySQL..."
+              sudo apt-get install -y mysql-server
+            else
+              echo "MySQL already installed."
+            fi
+
+            # MySQL 루트 비밀번호 환경 변수 설정
+            export DATABASE_URL="${{ secrets.DATABASE_URL }}"
+            export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
+
+            # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
             cd /home/ubuntu/Node
+
+            # .env 파일 생성 (Prisma에서 DATABASE_URL을 인식할 수 있도록)
+            echo "DATABASE_URL=$DATABASE_URL" > .env
+
+            # .env 파일 내용 확인
+            cat .env
+
+            # Prisma 마이그레이션
+            if [ -f "prisma/schema.prisma" ]; then
+              echo "Running Prisma migrations..."
+              npx prisma migrate deploy
+            else
+              echo "Prisma schema not found. Skipping migrations..."
+            fi
 
             # 최신 코드 pull
             git pull origin main
 
-            # 의존성 설치
+            # 종속성 설치
             npm install
 
-            # mysql 실행 확인 (안되어 있으면 시작)
-            if systemctl is-active --quiet mysql; then
-              echo "MySQL is running."
-            else
-              echo "MySQL is not running. Starting MySQL..."
-              sudo systemctl start mysql
-            fi
-
-            # elasticsearch 실행 확인 (안되어 있으면 시작)
-            if systemctl is-active --quiet elasticsearch; then
-              echo "Elasticsearch is running."
-            else
-              echo "Elasticsearch is not running. Starting Elasticsearch..."
-              sudo systemctl start elasticsearch
-            fi
-
-            # app 실행 확인 (안되어 있으면 시작) & 무중단 배포
-            if pm2 describe "app.js" > /dev/null; then
+            # 앱이 실행중이면 리로드, 실행중이 아니면 시작
+            if pm2 describe "app" > /dev/null; then
+              echo "App is already running, reloading it..."
               pm2 reload all
             else
-              pm2 start /home/ubuntu/Node/src/server.js --name "app.js"
+              echo "App is not running, starting it..."
+              pm2 start /home/ubuntu/Node/src/server.js —name "app"
             fi
 
-            # 무중단 배포 pm2 확인
-            pm2 status
+            pm2 save
           EOF
