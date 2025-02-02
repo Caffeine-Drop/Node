@@ -1,4 +1,4 @@
-import { elasticsearchClient } from '../elasticsearch.js';
+import { elasticsearchClient } from '../middlewares/elasticsearch.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
