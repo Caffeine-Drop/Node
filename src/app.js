@@ -7,7 +7,6 @@ import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
 import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
-
 const app = express();
 
 // CORS 미들웨어
