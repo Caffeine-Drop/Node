@@ -4,6 +4,9 @@ import syncCafesToElasticsearch from "./middlewares/elasticsearch.js";
 import responseMiddleware from "./middlewares/responseMiddleware.js";
 import searchMiddleware from "./middlewares/search_route.js";
 import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
+import swaggerUi from "swagger-ui-express";
+import yaml from "js-yaml";
+import fs from "fs";
 
 const app = express();
 
@@ -15,6 +18,11 @@ app.use(express.static("public"));
 app.use(express.json());
 // URL 인코딩 미들웨어
 app.use(express.urlencoded({ extended: true }));
+
+// YAML 파일 로드
+const swaggerDocument = yaml.load(fs.readFileSync("./swagger.yaml", "utf8"));
+// Swagger UI 설정
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 서버 시작 시 ElasticSearch 동기화 실행
 app.use(syncCafesToElasticsearch);
