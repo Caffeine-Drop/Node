@@ -1,4 +1,5 @@
 import * as user_repository from '../repositories/user_repository.js';
+import { NotFoundError, InternalServerError} from '../error/error.js';
 import { getUserInfoDto } from '../dtos/user_dto.js';
 
 //controller계층에서 전달받은 데이터가 데이터베이스에 존재하는 지 확인하려 다른 계층에 데이터를 보내고(service -> repository),
@@ -9,7 +10,7 @@ export const checkNicknameOverlap = async (nickname) => {
     if (user == null) return true;
     return false;
   } catch (error) {
-    throw new Error('닉네임 중복 검사 중 오류가 발생');
+    throw new InternalServerError('닉네임 중복 검사 중 에러 발생');
   }
 };
 
@@ -21,11 +22,13 @@ export const createNickname = async (userId, nickname) => {
   try {
     const existingUser = await user_repository.findByUserId(userId);
     if (existingUser == null) 
-        throw new Error('사용자를 찾을 수 없음.');
+      throw new NotFoundError('유저아이디를 찾을 수 없습니다.');
     await user_repository.createNickname(userId, nickname);
     return nickname;
   } catch (error) {
-    throw new Error('닉네임 생성 중 오류가 발생.');
+    if (error instanceof NotFoundError)
+      throw error;
+    throw new InternalServerError('닉네임 생성을 실패했습니다.');
   }
 };
 
@@ -36,11 +39,13 @@ export const createNickname = async (userId, nickname) => {
 export const changeNickname = async (userId, newNickname) => {
   try {
     const existingUser = await user_repository.findByUserId(userId);
-    if (existingUser == null) throw new Error('사용자를 찾을 수 없음.');
+    if (existingUser == null) throw new NotFoundError('유저 아이디를 찾을 수 없습니다.');
     await user_repository.changeNickname(userId, newNickname);
     return newNickname;
   } catch (error) {
-    throw new Error('닉네임 변경 중 오류가 발생.');
+    if (error instanceof NotFoundError)
+      throw error;
+    throw new InternalServerError('닉네임 변경을 실패했습니다.');
   }
 };
 
@@ -50,9 +55,11 @@ export const changeNickname = async (userId, newNickname) => {
 export const getUserInfo = async (userId) => {
   try {
     const user = await user_repository.findByUserId(userId);
-    if (user == false) throw new Error('사용자를 찾을 수 없음.');
+    if (user == null) throw new NotFoundError('유저 아이디를 찾을 수 없습니다.');
     return getUserInfoDto(user);
   } catch (error) {
-    throw new Error('사용자 정보 조회 중 오류가 발생.');
+    if (error instanceof NotFoundError)
+      throw error;
+    throw new InternalServerError('사용자 정보 조회를 실패했습니다');
   }
 };

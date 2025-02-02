@@ -1,17 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "../db.config.js";
+import { InternalServerError } from "../error/error.js";
 
 //service 계층에서 전달받은 닉네임이 데이터베이스에 존재하는지를 확인하여 중복여부를 확인하기 위한 함수
 //해당 닉네임을 가진 유저의 정보를 반환(repository -> service)한다
 export const findByNickname = async (nickname) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { nickname },
+    const user = await prisma.user.findFirst({
+      where: { nickname: nickname },
     });
     return user;
   } catch (error) {
-    throw new Error('중복 검사중 데이터베이스 조회 오류');
+    throw new InternalServerError('중복 검사중 데이터베이스 조회 오류');
   }
 };
 
@@ -24,7 +23,7 @@ export const findByUserId = async (userId) => {
     });
     return user;
   } catch (error) {
-    throw new Error('데이터베이스 조회 오류');
+    throw new InternalServerError('데이터베이스 조회 오류');
   }
 };
 
@@ -37,7 +36,7 @@ export const createNickname = async (userId, nickname) => {
     });
     return user;
   } catch (error) {
-    throw new Error('닉네임 생성 오류');
+    throw new InternalServerError('닉네임 생성 오류');
   }
 };
 
@@ -50,6 +49,6 @@ export const changeNickname = async (userId, newNickname) => {
     });
     return user;
   } catch (error) {
-    throw new Error('닉네임 변경 오류');
+    throw new InternalServerError('닉네임 변경 오류');
   }
 };
