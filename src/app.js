@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // YAML 파일 로드
-const swaggerDocument = yaml.load(fs.readFileSync("../swagger.yaml", "utf8"));
+const swaggerDocument = yaml.load(fs.readFileSync("../Node/swagger.yaml", "utf8"));
 // Swagger UI 설정
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
