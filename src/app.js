@@ -11,16 +11,20 @@ import path from "path";
 import { fileURLToPath } from 'url';
 const app = express();
 
-// 현재 파일 경로를 얻기 위한 코드
+// ESM 환경에서 __dirname을 얻는 방법
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Swagger YAML 파일 경로 설정
-const swaggerPath = path.resolve(__dirname, "../swagger.yaml");
-const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
+// Swagger YAML 파일 경로 설정 (절대 경로 사용)
+const swaggerPath = path.join(__dirname, "../swagger.yaml");
 
-// Swagger UI 설정
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Swagger UI 설정 && Swagger 파일이 존재하는지 확인
+if (!fs.existsSync(swaggerPath)) {
+	console.error("swagger.yaml 파일이 존재하지 않습니다:", swaggerPath);
+} else {
+	const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
+	app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
 
 // CORS 미들웨어
 app.use(cors());
