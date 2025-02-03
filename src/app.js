@@ -11,15 +11,6 @@ import path from "path";
 import { fileURLToPath } from 'url';
 const app = express();
 
-// CORS 미들웨어
-app.use(cors());
-// 정적 파일 제공 미들웨어
-app.use(express.static("public"));
-// JSON 파싱 미들웨어
-app.use(express.json());
-// URL 인코딩 미들웨어
-app.use(express.urlencoded({ extended: true }));
-
 // 현재 파일 경로를 얻기 위한 코드
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +21,15 @@ const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
 
 // Swagger UI 설정
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// CORS 미들웨어
+app.use(cors());
+// 정적 파일 제공 미들웨어
+app.use(express.static("public"));
+// JSON 파싱 미들웨어
+app.use(express.json());
+// URL 인코딩 미들웨어
+app.use(express.urlencoded({ extended: true }));
 
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
