@@ -8,6 +8,7 @@ import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
 const app = express();
 
 // CORS 미들웨어
@@ -19,8 +20,12 @@ app.use(express.json());
 // URL 인코딩 미들웨어
 app.use(express.urlencoded({ extended: true }));
 
-// YAML 파일 로드
-const swaggerPath = path.resolve(process.cwd(), "swagger.yaml");
+// 현재 파일 경로를 얻기 위한 코드
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Swagger YAML 파일 경로 설정
+const swaggerPath = path.resolve(__dirname, "../swagger.yaml");
 const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
 
 // Swagger UI 설정
