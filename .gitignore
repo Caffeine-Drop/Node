@@ -1,6 +1,5 @@
 node_modules
 prisma
-app.js
+src/app.js
 package.json
-# Keep environment variables out of version control
 .env
