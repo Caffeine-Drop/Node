@@ -1,6 +1,7 @@
 import {
   getReviews as fetchReviews, 
   getTotalReviews as fetchTotalReviews,
+  getCafeOverallRating as fetchCafeOverallRating,
 } from "../repositories/review_query_repository.js";
 import {
   ValidationError,
@@ -29,11 +30,16 @@ export const getReviews = async (cafeId, offset = 0, limit = 10) => {
     // 리뷰 조회 및 총 개수 가져오기
     const reviews = await fetchReviews(parsedCafeId, parsedOffset, parsedLimit);
     const totalCount = await fetchTotalReviews(parsedCafeId);
+    const overallRatingResult = await fetchCafeOverallRating(parsedCafeId);
 
     // 리뷰 존재 여부 확인
     if (reviews.length === 0) {
       throw new NotFoundError("해당 카페에 리뷰가 존재하지 않습니다.");
     }
+
+    const overallRating = overallRatingResult._avg.rating
+    ? parseFloat(overallRatingResult._avg.rating.toFixed(1)) // 평균 별점만 반올림
+    : null;
 
     // 페이지네이션 정보 계산
     const currentPage = Math.ceil(parsedOffset / parsedLimit) + 1;
@@ -44,6 +50,7 @@ export const getReviews = async (cafeId, offset = 0, limit = 10) => {
       totalCount,
       currentPage,
       totalPages,
+      overallRating,
     };
 
   } catch (error) {

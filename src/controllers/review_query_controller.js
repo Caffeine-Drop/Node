@@ -1,4 +1,4 @@
-import * as reviewService from "../services/review_service.js";
+import * as reviewService from "../services/review_query_service.js";
 
 export const getReviews = async (req, res) => {
   try {
@@ -30,6 +30,7 @@ export const getReviews = async (req, res) => {
           currentPage: data.currentPage,
           totalPages: data.totalPages,
         },
+        overallRating: data.overallRating,
       },
       error: null,
     });
