@@ -31,8 +31,6 @@ const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
 // Swagger UI 설정
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// 서버 시작 시 ElasticSearch 동기화 실행
-app.use(syncCafesToElasticsearch);
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
 // 카페 전체정보 조회 미들웨어
