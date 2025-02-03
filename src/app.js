@@ -7,6 +7,8 @@ import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
 import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 const app = express();
 
 // CORS 미들웨어
@@ -19,7 +21,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // YAML 파일 로드
-const swaggerDocument = yaml.load(fs.readFileSync("../Node/swagger.yaml", "utf8"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const swaggerPath = path.join(__dirname, "../swagger.yaml");
+
+// 파일 읽기
+const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
+
 // Swagger UI 설정
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
