@@ -1,4 +1,6 @@
 import { InternalServerError, NotFoundError } from '../error/error.js';
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 class SearchService {
     constructor(searchRepository) {
@@ -6,15 +8,15 @@ class SearchService {
     }
     
     // 카페 검색
-    async searchCafes(user_id, keyword, lat, lng, radius) {         
+    async searchCafes(userId, keyword, lat, lng, radius) {         
         try {
-            const user = await this.userRepository.findById(user_id);
+            const user = await prisma.user.findFirst({ where: { user_id: userId } });
             if (!user) {
                 throw new NotFoundError({ message: '유저가 존재하지 않습니다.' });
             }
 
             this.searchRepository.incrementSearchCount(keyword); // 키워드 카운트 증가
-            await this.searchRepository.saveRecentSearch(user_id, keyword); // 최근 검색어 저장
+            await this.searchRepository.saveRecentSearch(userId, keyword); // 최근 검색어 저장
             const cafes = await this.searchRepository.searchCafesByKeyword(keyword, lat, lng, radius); // 키워드로 검색
 
             const cafeResponseDTOs = cafes.map(cafe => new CafeResponseDTO(
@@ -48,7 +50,7 @@ class SearchService {
 
     // 최근 검색어 10개
     async recentTerms(userId) {
-        const user = await this.userRepository.findById(user_id);
+        const user = await prisma.user.findFirst({ where: { user_id: userId } });
         if (!user) {
             throw new NotFoundError({ message: '유저가 존재하지 않습니다.' });
         }
@@ -65,7 +67,7 @@ class SearchService {
 
     // 검색어 삭제 1개
     async deleteRecentSearch(userId, term) {
-        const user = await this.userRepository.findById(user_id);
+        const user = await prisma.user.findFirst({ where: { user_id: userId } });
         if (!user) {
             throw new NotFoundError({ message: '유저가 존재하지 않습니다.' });
         }
@@ -85,7 +87,7 @@ class SearchService {
 
     // 검색어 삭제 전체
     async deleteAllRecentSearches(userId) {
-        const user = await this.userRepository.findById(user_id);
+        const user = await prisma.user.findFirst({ where: { user_id: userId } });
         if (!user) {
             throw new NotFoundError({ message: '유저가 존재하지 않습니다.' });
         }

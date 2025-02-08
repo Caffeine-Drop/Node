@@ -1,6 +1,5 @@
-import { elasticsearchClient } from '../elasticsearch.js';
+import { elasticsearchClient } from '../middlewares/elasticsearch.js';
 import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
 
 class SearchRepository {
@@ -34,7 +33,7 @@ class SearchRepository {
   // 유저별 최근 검색어 저장
   async saveRecentSearch(user_id, keyword) {
     // 기존 검색어가 있는지 확인
-    const existingSearch = await prisma.recentSearch.findUnique({
+    const existingSearch = await prisma.recentSearch.findFirst({
       where: {
           user_id_search_term: {
             user_id: parseInt(user_id),

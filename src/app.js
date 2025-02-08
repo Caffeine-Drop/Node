@@ -4,6 +4,7 @@ import syncCafesToElasticsearch from './middlewares/elasticsearch.js';
 import responseMiddleware from './middlewares/responseMiddleware.js';
 import searchMiddleware from './middlewares/search_route.js';
 import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
+import likeMiddelware from './middlewares/like_route.js';
 
 const app = express();
 
@@ -24,6 +25,8 @@ app.use(responseMiddleware);
 app.use(cafeCheckMiddleware);
 // 검색 관련 API 미들웨어
 app.use('/search', searchMiddleware);
+// 좋아요 관련 API 미들웨어
+app.use("/like", likeMiddelware);
 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
