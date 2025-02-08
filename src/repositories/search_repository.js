@@ -158,3 +158,5 @@ class SearchRepository {
     console.log(`${userId} 모든 검색어 삭제 완료`);
   }
 }
+
+export default SearchRepository;
