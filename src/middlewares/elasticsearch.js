@@ -25,18 +25,30 @@ export default async function syncCafesToElasticsearch() {
   try {
     await checkElasticsearchConnection();
 
-    await elasticsearchClient.indices.exists({ index: 'cafes' })
-      .then(async (exists) => {
-        if (!exists.body) {
-          await elasticsearchClient.indices.create({
-            index: 'cafes',
-          });
-          console.log('Elasticsearch 인덱스 "cafes"가 생성되었습니다.');
+    // 인덱스 존재 여부 확인
+    const indexExists = await elasticsearchClient.indices.exists({ index: 'cafes' });
+
+    if (!indexExists.body) {
+      // 인덱스가 존재하지 않으면 새로 생성
+      try {
+        await elasticsearchClient.indices.create({ index: 'cafes' });
+        console.log('Elasticsearch 인덱스 "cafes"가 생성되었습니다.');
+      } catch (err) {
+        // 이미 존재하는 경우 에러 무시
+        if (
+          err.meta &&
+          err.meta.body &&
+          err.meta.body.error &&
+          err.meta.body.error.type === 'resource_already_exists_exception'
+        ) {
+          console.log('Elasticsearch 인덱스 "cafes"가 이미 존재합니다.');
+        } else {
+          throw err;
         }
-      })
-      .catch((err) => {
-        console.error('Elasticsearch 인덱스 존재 확인 중 에러:', err);
-      });
+      }
+    } else {
+      console.log('Elasticsearch 인덱스 "cafes"가 이미 존재합니다.');
+    }
 
     // MySQL에서 모든 카페 데이터 가져오기
     const cafes = await prisma.cafe.findMany();
@@ -47,16 +59,45 @@ export default async function syncCafesToElasticsearch() {
       return;
     }
 
+    // 각 카페 데이터를 Elasticsearch에 인덱싱
     for (const cafe of cafes) {
-      await elasticsearchClient.index({
-        index: 'cafes',
-        id: cafe.id.toString(),
-        body: {
-          name: cafe.name,
-          menu_items: cafe.menu_items,
-          address: cafe.address,
-        },
-      });
+      try {
+        // 문서가 이미 존재하면 update, 없으면 insert
+        const existingDoc = await elasticsearchClient.exists({
+          index: 'cafes',
+          id: cafe.id.toString(),
+        });
+
+        if (existingDoc.body) {
+          // 문서가 이미 존재하면 update
+          await elasticsearchClient.update({
+            index: 'cafes',
+            id: cafe.id.toString(),
+            body: {
+              doc: {
+                name: cafe.name,
+                menu_items: cafe.menu_items,
+                address: cafe.address,
+              },
+            },
+          });
+          console.log(`카페 ${cafe.id} 업데이트 완료`);
+        } else {
+          // 문서가 없으면 새로 삽입
+          await elasticsearchClient.index({
+            index: 'cafes',
+            id: cafe.id.toString(),
+            body: {
+              name: cafe.name,
+              menu_items: cafe.menu_items,
+              address: cafe.address,
+            },
+          });
+          console.log(`카페 ${cafe.id} 삽입 완료`);
+        }
+      } catch (err) {
+        console.error(`카페 ${cafe.id} 처리 중 오류 발생:`, err);
+      }
     }
 
     console.log('엘라스틱서치 동기화 성공');

@@ -36,15 +36,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            # MySQL이 설치되어 있지 않으면 설치
-            if ! command -v mysql &> /dev/null
-            then
-              echo "MySQL not found. Installing MySQL..."
-              sudo apt-get install -y mysql-server
-            else
-              echo "MySQL already installed."
-            fi
-
             # MySQL 루트 비밀번호 환경 변수 설정
             export DATABASE_URL="${{ secrets.DATABASE_URL }}"
             export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
@@ -54,9 +45,7 @@ jobs:
 
             # .env 파일 생성 (Prisma에서 DATABASE_URL을 인식할 수 있도록)
             echo "DATABASE_URL=$DATABASE_URL" > .env
-
-            # .env 파일 내용 확인
-            cat .env
+            echo "MYSQL_ROOT_PASSWORD" > .env
 
             # Prisma 마이그레이션
             if [ -f "prisma/schema.prisma" ]; then
@@ -72,13 +61,29 @@ jobs:
             # 종속성 설치
             npm install
 
-            # 앱이 실행중이면 리로드, 실행중이 아니면 시작
+            # mysql 실행 확인 (안되어 있으면 시작)
+            if systemctl is-active --quiet mysql; then
+              echo "MySQL is running."
+            else
+              echo "MySQL is not running. Starting MySQL..."
+              sudo systemctl start mysql
+            fi
+
+            # elasticsearch 실행 확인 (안되어 있으면 시작)
+            if systemctl is-active --quiet elasticsearch; then
+              echo "Elasticsearch is running."
+            else
+              echo "Elasticsearch is not running. Starting Elasticsearch..."
+              sudo systemctl start elasticsearch
+            fi
+
+            # app 실행 확인 (안되어 있으면 시작) & 무중단 배포
             if pm2 describe "app" > /dev/null; then
               echo "App is already running, reloading it..."
               pm2 reload all
             else
               echo "App is not running, starting it..."
-              pm2 start /home/ubuntu/Node/src/server.js —name "app"
+              pm2 start /home/ubuntu/Node/src/server.js --name "app" --env DATABASE_URL="$DATABASE_URL" --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD"
             fi
 
             pm2 save

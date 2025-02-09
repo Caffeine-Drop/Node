@@ -1,13 +1,31 @@
 import express from "express";
 import cors from "cors";
-import syncCafesToElasticsearch from "./middlewares/elasticsearch.js";
-import responseMiddleware from "./middlewares/responseMiddleware.js";
-import searchMiddleware from "./middlewares/search_route.js";
-import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
+import responseMiddleware from './middlewares/responseMiddleware.js';
+import searchMiddleware from './middlewares/search_route.js';
+import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
+import likeMiddelware from './middlewares/like_route.js';
 import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from 'url';
+
 const app = express();
+
+// ESM 환경에서 __dirname을 얻는 방법
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Swagger YAML 파일 경로 설정 (절대 경로 사용)
+const swaggerPath = path.join(__dirname, "../swagger.yaml");
+
+// Swagger UI 설정 && Swagger 파일이 존재하는지 확인
+if (!fs.existsSync(swaggerPath)) {
+	console.error("swagger.yaml 파일이 존재하지 않습니다:", swaggerPath);
+} else {
+	const swaggerDocument = yaml.load(fs.readFileSync(swaggerPath, "utf8"));
+	app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
 
 // CORS 미들웨어
 app.use(cors());
@@ -18,19 +36,14 @@ app.use(express.json());
 // URL 인코딩 미들웨어
 app.use(express.urlencoded({ extended: true }));
 
-// YAML 파일 로드
-const swaggerDocument = yaml.load(fs.readFileSync("./swagger.yaml", "utf8"));
-// Swagger UI 설정
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// 서버 시작 시 ElasticSearch 동기화 실행
-app.use(syncCafesToElasticsearch);
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
 // 카페 전체정보 조회 미들웨어
 app.use(cafeCheckMiddleware);
 // 검색 관련 API 미들웨어
-app.use("/search", searchMiddleware);
+app.use('/search', searchMiddleware);
+// 좋아요 관련 API 미들웨어
+app.use("/like", likeMiddelware);
 
 app.get("/", (req, res) => {
 	res.send("Hello, Express!");
