@@ -31,9 +31,6 @@ export const readAllCafe = async (req, res, next) => {
           cafeList : cafes,
       });
   } catch (error) {
-      if (error instanceof NotFoundError) {
-          return res.status(404).json({ message: error.message });
-      }
       return res.status(500).json({ message: '알 수 없는 에러', error: error.message });
   }
 }

@@ -17,9 +17,6 @@ export class readCafeInfos {
 
   static async getCafe() {
     const cafes = await CafeRepository.findCafe();
-    if (!cafes) {
-      throw new NotFoundError('카페가 존재하지 않습니다.');
-    }
     return cafes.map(cafe => cafe.id);
   }
 }
