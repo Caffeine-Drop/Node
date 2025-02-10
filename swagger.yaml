@@ -14,11 +14,7 @@ paths:
       parameters:
         - in: header
           name: Authorization
-          required: true
           description: 토큰에서 추출한 유저 아이디
-          schema:
-            type: string
-            example: "Bearer {토큰}"
         - in: header
           name: provider
           required: true
@@ -137,11 +133,7 @@ paths:
       parameters:
         - in: header
           name: Authorization
-          required: true
           description: 토큰에서 추출한 유저 아이디
-          schema:
-            type: string
-            example: "Bearer {토큰}"
         - in: header
           name: provider
           required: true
@@ -151,6 +143,13 @@ paths:
             enum:
               - naver
               - kakao
+        - in: query
+          name: untilTime
+          required: true
+          description: 검색 기준 시간
+          schema:
+            type: string
+            example: "2025-01-26T12:00:00Z"
       responses:
         "200":
           description: 상위 6개 검색어와 기준 시간 반환
@@ -506,7 +505,7 @@ paths:
   /cafes/{cafe_id}/beans:
     get:
       tags:
-        - Cafe Beans
+        - "Cafe Beans"
       summary: 특정 카페의 보유 원두 정보를 조회하는 API
       description: 카페의 보유원두정보, 스페셜티정보, 원두-태그 연결관계, 태그정보를 조회합니다.
       parameters:
@@ -810,7 +809,7 @@ paths:
   /cafes/{cafe_id}/specialty:
     get:
       tags:
-        - Cafes
+        - Cafe Beans
       summary: 카페의 스페셜티 인증커피 보유여부를 조회하는 API
       description: 특정 카페의 스페셜티 인증커피 보유 여부를 확인합니다.
       parameters:
@@ -909,7 +908,7 @@ paths:
   /users/{user_id}/preferred-beans:
     get:
       tags:
-        - Users
+        - Cafe Beans
       summary: 특정 사용자의 선호원두 정보를 조회하는 API
       description: 사용자의 모든 선호 원두 정보를 조회합니다.
       parameters:
@@ -1038,116 +1037,10 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
-  /users/{user_id}:
-    get:
-      tags:
-        - Users
-      summary: 사용자 정보를 조회하기 위한 API
-      description: 특정 사용자의 상세 정보를 조회합니다.
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          description: 조회하고자 하는 유저 아이디
-          schema:
-            type: integer
-            example: 1
-      responses:
-        "200":
-          description: 사용자 정보 조회 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Success"
-                  status:
-                    type: integer
-                    example: 200
-                  success:
-                    type: object
-                    properties:
-                      userId:
-                        type: integer
-                        example: 1
-                      nickname:
-                        type: string
-                        example: "test11113"
-                      email:
-                        type: string
-                        format: email
-                        example: "example@example.com"
-                      profileImageUrl:
-                        type: string
-                        format: uri
-                        example: "https://example.com/profile.jpg"
-                      createdAt:
-                        type: string
-                        format: date-time
-                        example: "2025-01-25T21:23:19.000Z"
-                      updatedAt:
-                        type: string
-                        format: date-time
-                        example: "2025-02-01T11:00:23.096Z"
-                  error:
-                    type: null
-                    example: null
-        "404":
-          description: 사용자를 찾을 수 없음
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Fail"
-                  status:
-                    type: integer
-                    example: 404
-                  success:
-                    type: null
-                    example: null
-                  error:
-                    type: object
-                    properties:
-                      errorCode:
-                        type: string
-                        example: "NotFoundError"
-                      message:
-                        type: string
-                        example: "유저 아이디를 찾을 수 없습니다."
-        "500":
-          description: 서버 내부 오류
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Fail"
-                  status:
-                    type: integer
-                    example: 500
-                  success:
-                    type: null
-                    example: null
-                  error:
-                    type: object
-                    properties:
-                      errorCode:
-                        type: string
-                        example: "InternalServerError"
-                      message:
-                        type: string
-                        example: "사용자 정보 조회를 실패했습니다"
   /users/{user_id}/preferred-bean:
     post:
       tags:
-        - Users
+        - Cafe Beans
       summary: 특정 사용자의 선호원두 정보를 생성하는 API
       description: 사용자의 원두 선호도 정보(로스팅, 향, 산미, 바디감, 원산지)를 생성합니다.
       parameters:
@@ -1287,6 +1180,231 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
+    /users/{user_id}/preferred-bean/{prefered_id}:
+    delete:
+      tags:
+        - Cafe Beans
+      summary: 특정 사용자의 선호원두 정보를 삭제하는 API
+      description: 사용자의 특정 선호 원두 정보를 삭제합니다.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 사용자 id
+          schema:
+            type: integer
+            example: 1
+        - in: path
+          name: prefered_id
+          required: true
+          description: 선호원두 id
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 선호원두 정보 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "선호원두 정보가 성공적으로 삭제되었습니다."
+                  error:
+                    type: null
+                    example: null
+        "403":
+          description: 권한 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 403
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "ForbiddenError"
+                      message:
+                        type: string
+                        example: "해당 작업을 수행할 권한이 없습니다."
+        "404":
+          description: 요청한 데이터를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "해당하는 선호원두 정보를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+    /users/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: 사용자 정보를 조회하기 위한 API
+      description: 특정 사용자의 상세 정보를 조회합니다.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 조회하고자 하는 유저 아이디
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 사용자 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        example: 1
+                      nickname:
+                        type: string
+                        example: "test11113"
+                      email:
+                        type: string
+                        format: email
+                        example: "example@example.com"
+                      profileImageUrl:
+                        type: string
+                        format: uri
+                        example: "https://example.com/profile.jpg"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2025-01-25T21:23:19.000Z"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2025-02-01T11:00:23.096Z"
+                  error:
+                    type: null
+                    example: null
+        "404":
+          description: 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "유저 아이디를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "사용자 정보 조회를 실패했습니다"
   /users/check-nickname:
     post:
       tags:
@@ -1650,125 +1768,11 @@ paths:
                       message:
                         type: string
                         example: "닉네임 변경을 실패했습니다."
-  /users/{user_id}/preferred-bean/{prefered_id}:
-    delete:
-      tags:
-        - Users
-      summary: 특정 사용자의 선호원두 정보를 삭제하는 API
-      description: 사용자의 특정 선호 원두 정보를 삭제합니다.
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          description: 사용자 id
-          schema:
-            type: integer
-            example: 1
-        - in: path
-          name: prefered_id
-          required: true
-          description: 선호원두 id
-          schema:
-            type: integer
-            example: 1
-      responses:
-        "200":
-          description: 선호원두 정보 삭제 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Success"
-                  status:
-                    type: integer
-                    example: 200
-                  success:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example: "선호원두 정보가 성공적으로 삭제되었습니다."
-                  error:
-                    type: null
-                    example: null
-        "403":
-          description: 권한 없음
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Fail"
-                  status:
-                    type: integer
-                    example: 403
-                  success:
-                    type: null
-                    example: null
-                  error:
-                    type: object
-                    properties:
-                      errorCode:
-                        type: string
-                        example: "ForbiddenError"
-                      message:
-                        type: string
-                        example: "해당 작업을 수행할 권한이 없습니다."
-        "404":
-          description: 요청한 데이터를 찾을 수 없음
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Fail"
-                  status:
-                    type: integer
-                    example: 404
-                  success:
-                    type: null
-                    example: null
-                  error:
-                    type: object
-                    properties:
-                      errorCode:
-                        type: string
-                        example: "NotFoundError"
-                      message:
-                        type: string
-                        example: "해당하는 선호원두 정보를 찾을 수 없습니다."
-        "500":
-          description: 서버 내부 오류
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    example: "Fail"
-                  status:
-                    type: integer
-                    example: 500
-                  success:
-                    type: null
-                    example: null
-                  error:
-                    type: object
-                    properties:
-                      errorCode:
-                        type: string
-                        example: "InternalServerError"
-                      message:
-                        type: string
-                        example: "서버 에러"
+  /oauth2/login/kakao:
+    get:
+      summary: "카카오 로그인"
+      description: "링크 접속 -> 액세스 토큰 복사 -> 오른쪽맨위에 붙여넣기
+                    http://localhost:3000/oauth2/login/kakao "
 components:
   securitySchemes:
     bearerAuth:

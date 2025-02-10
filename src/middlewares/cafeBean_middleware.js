@@ -3,7 +3,7 @@ import { Router } from "express";
 
 const router = Router();
 
-//카페 보유원두 전체 상세조회 API
+// 카페 보유원두 전체 상세조회 API
 router.get("/cafes/:cafe_id/beans", getCafeBeansDetails);
 
 // 카페 스페셜티 인증여부 조회 API
