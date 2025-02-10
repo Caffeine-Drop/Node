@@ -14,11 +14,7 @@ paths:
       parameters:
         - in: header
           name: Authorization
-          required: true
           description: 토큰에서 추출한 유저 아이디
-          schema:
-            type: string
-            example: "Bearer {토큰}"
         - in: header
           name: provider
           required: true
@@ -137,11 +133,7 @@ paths:
       parameters:
         - in: header
           name: Authorization
-          required: true
           description: 토큰에서 추출한 유저 아이디
-          schema:
-            type: string
-            example: "Bearer {토큰}"
         - in: header
           name: provider
           required: true
@@ -151,6 +143,13 @@ paths:
             enum:
               - naver
               - kakao
+        - in: query
+          name: untilTime
+          required: true
+          description: 검색 기준 시간
+          schema:
+            type: string
+            example: "2025-01-26T12:00:00Z"
       responses:
         "200":
           description: 상위 6개 검색어와 기준 시간 반환
