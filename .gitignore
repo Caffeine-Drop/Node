@@ -3,3 +3,4 @@ prisma
 src/app.js
 package.json
 .env
+.github
