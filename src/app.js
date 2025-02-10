@@ -9,6 +9,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { NotFoundError } from "./error/error.js";
 
 const app = express();
 
