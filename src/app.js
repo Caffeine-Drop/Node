@@ -8,6 +8,7 @@ import likeMiddelware from './middlewares/like_route.js';
 import userRouter from './routes/userRouter.js'; // 사용자 관련 라우터 import
 import authRouter from './routes/authRouter.js'; // 연동 로그인 인증 관련 라우터 import
 import { setupPassport } from './auth.js'; // auth.js에서 Passport 설정 import
+import cafeBeanMiddleware from './middlewares/cafeBean_middleware.js';
 import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
@@ -56,6 +57,8 @@ app.use("/like", likeMiddelware);
 // 사용자 관련 라우터 연동
 app.use('/users', userRouter);
 app.use('/oauth2', authRouter);
+// 원두 관련 API 미들웨어
+app.use(cafeBeanMiddleware);
 
 app.get("/", (req, res) => {
 	res.send("Hello, Express!");
