@@ -1,5 +1,6 @@
 import { CafeRepository } from '../repositories/cafe_repository.js';
 import { CafeDto } from '../dtos/cafe_dto.js';
+import { NotFoundError } from '../error/error.js';
 
 export class readCafeInfos {
   static async getCafeById(cafeId) {
@@ -12,5 +13,10 @@ export class readCafeInfos {
 
     // CafeDto로 응답 데이터를 포맷
     return new CafeDto(cafe);
+  }
+
+  static async getCafe() {
+    const cafes = await CafeRepository.findCafe();
+    return cafes.map(cafe => cafe.id);
   }
 }

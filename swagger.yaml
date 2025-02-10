@@ -467,6 +467,42 @@ paths:
                   error:
                     type: string
                     example: "서버 에러"
+  /cafes/ids:
+    get:
+      summary: "전체 카페 ID 반환"
+      description: "전체 카페의 ID를 반환합니다."
+      operationId: "getCafeIds"
+      tags:
+        - "Cafes"
+      responses:
+        '200':
+          description: "전체 카페 ID 목록 반환 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "전체 카페 id 반환"
+                  cafeList:
+                    type: array
+                    items:
+                      type: string
+                      example: "cafe123"
+        '500':
+          description: "알 수 없는 에러 발생"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버에서 알 수 없는 에러 발생"
   /cafes/{cafe_id}/beans:
     get:
       tags:
