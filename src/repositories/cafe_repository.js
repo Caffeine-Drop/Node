@@ -34,4 +34,11 @@ export class CafeRepository {
       throw new Error('Error fetching cafe from database');
     }
   }
+
+  static async findCafe() {
+    const cafe = await prisma.cafe.findMany({
+      select: { cafe_id: true },
+    });
+    return cafe;
+  }
 }

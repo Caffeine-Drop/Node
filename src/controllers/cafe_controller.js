@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { readCafeInfos } from '../services/cafe_service.js';
+import { NotFoundError } from '../error/error.js';
 
 export const handleReadCafes = async (req, res, next) => {
   try {
@@ -21,3 +22,18 @@ export const handleReadCafes = async (req, res, next) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+export const readAllCafe = async (req, res, next) => {
+  try {
+      const cafes = await readCafeInfos.getCafe();
+      return res.status(200).json({
+          message: '전체 카페 id 반환',
+          cafeList : cafes,
+      });
+  } catch (error) {
+      if (error instanceof NotFoundError) {
+          return res.status(404).json({ message: error.message });
+      }
+      return res.status(500).json({ message: '알 수 없는 에러', error: error.message });
+  }
+}
