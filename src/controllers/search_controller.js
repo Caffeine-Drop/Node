@@ -12,7 +12,7 @@ class SearchController {
         const lat = Number(req.query.lat);
         const lng = Number(req.query.lng);
         const radius = Number(req.query.radius);
-
+        
         if (!user_id || isNaN(user_id)) {
             return res.status(400).json({ message: '유저 아이디는 필수이며 숫자여야 합니다.' });
         }
@@ -30,7 +30,7 @@ class SearchController {
         }
 
         try {
-            const result = await service.searchCafes(user_id, keyword);
+            const result = await service.searchCafes(user_id, keyword, lat, lng, radius);
             return res.status(200).json({
                 message: '검색 완료',
                 term : keyword,

@@ -1,5 +1,6 @@
 import { elasticsearchClient } from '../middlewares/elasticsearch.js';
 import { PrismaClient } from '@prisma/client';
+import CafeResponseDTO from '../dtos/search_dto.js';
 const prisma = new PrismaClient();
 
 class SearchRepository {
@@ -35,10 +36,8 @@ class SearchRepository {
     // 기존 검색어가 있는지 확인
     const existingSearch = await prisma.recentSearch.findFirst({
       where: {
-          user_id_search_term: {
-            user_id: parseInt(user_id),
-            search_term: keyword,
-          },
+        user_id: parseInt(user_id),
+        search_term: keyword,
       },
     });
 
@@ -62,7 +61,7 @@ class SearchRepository {
           },
       });
     }
-    console.log(`${keyword} : ${user_id} 개인 검색어 저장 완료`);
+    console.log(`${keyword} : ${user_id} / 개인 검색어 저장 완료`);
   }
 
   // 키워드 검색 - 한국어 최적화 및 검색 반경 설정
@@ -77,6 +76,7 @@ class SearchRepository {
                 multi_match: {
                   query: keyword,
                   fields: ['name', 'menu_items', 'address'],
+                  fuzziness: 'AUTO',
                 },
               },
             ],
@@ -94,9 +94,30 @@ class SearchRepository {
       },
     });
 
-    console.log(`${keyword} 검색 완료`);
+    console.log('검색 완료');
 
-    return result.hits.hits.map((hit) => hit._source);
+    const hits = result.hits.hits;
+    if (Array.isArray(hits) && hits.length > 0) {
+      const cafeResponseDTOs = hits.map(hit => {
+        const cafe = hit._source;
+        return new CafeResponseDTO(
+          cafe.name,
+          cafe.location ? cafe.location.lat : null,  // 위치 정보가 있으면 lat
+          cafe.location ? cafe.location.lon : null,  // 위치 정보가 있으면 lon
+          cafe.address,
+          cafe.operatingHours || null,  // operatingHours가 없으면 null
+          cafe.images || null,  // images가 없으면 null
+          cafe.likes || 0,  // likes가 없으면 0
+          cafe.reviewRate || 0,  // reviewRate가 없으면 0
+          cafe.reviewCount || 0,  // reviewCount가 없으면 0
+          cafe.specialty || null  // specialty가 없으면 null
+        );
+      });
+      return cafeResponseDTOs;
+    } else {
+      console.log("검색된 카페가 없습니다.");
+      return [];
+    }
   }
 
   // 기준 시간 입력 시 인기 순위 6개 단어 반환
