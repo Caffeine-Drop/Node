@@ -1,19 +1,17 @@
 import dotenv from "dotenv";
 import { Strategy as KakaoStrategy } from "passport-kakao"
 import { Strategy as NaverStrategy } from "passport-naver-v2";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "./db.config.js";
 import { NotFoundError, ValidationError } from "./error/error.js";
 
 dotenv.config();
-
-const prisma = new PrismaClient();
 
 //네이버 인증 전략 설정
 export const naverStrategy = new NaverStrategy(
   {
     clientID: process.env.PASSPORT_NAVER_CLIENT_ID,  
     clientSecret: process.env.PASSPORT_NAVER_CLIENT_SECRET, 
-    callbackURL: "http://13.124.11.195:3000/oauth2/callback/naver", //인증 후 콜백 URL
+    callbackURL: "http://localhost:3000/oauth2/callback/naver", //인증 후 콜백 URL
     scope: ["profile", "email"], //요청할 권한
   },
   (accessToken, refreshToken, profile, cb) => {
@@ -37,6 +35,7 @@ const naverVerify = async (profile, accessToken, refreshToken) => {
 
     const createdUser = await prisma.user.create({
       data: {
+        user_id: profile.id, //네이버에서 주는 id값을 user_id로 저장
         email,
         email_type: "naver",
         nickname: profile.name || " ",  // 프로필 이름이 없으면 빈 문자열로 처리
@@ -56,7 +55,7 @@ export const kakaoStrategy = new KakaoStrategy(
   {
     clientID: process.env.PASSPORT_KAKAO_CLIENT_ID,  
     clientSecret: process.env.PASSPORT_KAKAO_CLIENT_SECRET,
-    callbackURL: "http://13.124.11.195:3000/oauth2/callback/kakao", //인증 후 콜백 URL
+    callbackURL: "http://localhost:3000/oauth2/callback/kakao", //인증 후 콜백 URL
   },
   (accessToken, refreshToken, profile, cb) => {
     return kakaoVerify(profile, accessToken, refreshToken) //프로필을 이용해 유저를 검증하고, 반환된 유저 정보를 콜백함수로 전달
@@ -79,6 +78,7 @@ const kakaoVerify = async (profile, accessToken, refreshToken) => {
   
     const createdUser = await prisma.user.create({
       data: {
+        user_id: String(profile.id), //정수형으로 오기에 문자형으로 바꾸어 저장
         email,
         email_type: "kakao",
         nickname: profile.name || " ", //프로필 이름이 없으면 빈 문자열로 저장
