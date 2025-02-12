@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 import { Strategy as KakaoStrategy } from "passport-kakao"
 import { Strategy as NaverStrategy } from "passport-naver-v2";
-import { prisma } from "./db.config.js";
 import { NotFoundError, ValidationError } from "./error/error.js";
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 dotenv.config();
 
