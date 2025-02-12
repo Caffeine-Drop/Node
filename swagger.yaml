@@ -1772,7 +1772,7 @@ paths:
     get:
       summary: "카카오 로그인"
       description: "링크 접속 -> 액세스 토큰 복사 -> 오른쪽맨위에 붙여넣기
-                    http://localhost:3000/oauth2/login/kakao "
+                    http://13.124.11.195:3000/oauth2/login/kakao"
 components:
   securitySchemes:
     bearerAuth:
