@@ -35,6 +35,7 @@ const naverVerify = async (profile, accessToken, refreshToken) => {
 
     const createdUser = await prisma.user.create({
       data: {
+        user_id: profile.id, //네이버에서 주는 id값을 user_id로 저장
         email,
         email_type: "naver",
         nickname: profile.name || " ",  // 프로필 이름이 없으면 빈 문자열로 처리
@@ -77,6 +78,7 @@ const kakaoVerify = async (profile, accessToken, refreshToken) => {
   
     const createdUser = await prisma.user.create({
       data: {
+        user_id: String(profile.id), //정수형으로 오기에 문자형으로 바꾸어 저장
         email,
         email_type: "kakao",
         nickname: profile.name || " ", //프로필 이름이 없으면 빈 문자열로 저장
