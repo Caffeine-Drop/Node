@@ -29,6 +29,11 @@ jobs:
           EC2_USER: ${{ secrets.EC2_USER }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          EXPRESS_SESSION_SECRET: ${{ secrets.EXPRESS_SESSION_SECRET }}
+          PASSPORT_NAVER_CLIENT_ID: ${{ secrets.PASSPORT_NAVER_CLIENT_ID }}
+          PASSPORT_NAVER_CLIENT_SECRET: ${{ secrets.PASSPORT_NAVER_CLIENT_SECRET }}
+          PASSPORT_KAKAO_CLIENT_ID: ${{ secrets.PASSPORT_KAKAO_CLIENT_ID }}
+          PASSPORT_KAKAO_CLIENT_SECRET: ${{ secrets.PASSPORT_KAKAO_CLIENT_SECRET }}
 
         run: |
           mkdir -p ~/.ssh
@@ -36,16 +41,33 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            # MySQL 루트 비밀번호 환경 변수 설정
+            # 환경 변수 설정
             export DATABASE_URL="${{ secrets.DATABASE_URL }}"
             export MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}"
+            export EXPRESS_SESSION_SECRET="${{ secrets.EXPRESS_SESSION_SECRET }}"
+            export PASSPORT_NAVER_CLIENT_ID="${{ secrets.PASSPORT_NAVER_CLIENT_ID }}"
+            export PASSPORT_NAVER_CLIENT_SECRET="${{ secrets.PASSPORT_NAVER_CLIENT_SECRET }}"
+            export PASSPORT_KAKAO_CLIENT_ID="${{ secrets.PASSPORT_KAKAO_CLIENT_ID }}"
+            export PASSPORT_KAKAO_CLIENT_SECRET="${{ secrets.PASSPORT_KAKAO_CLIENT_SECRET }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
 
             # EC2 서버에 배포된 Node.js 애플리케이션 위치로 이동
             cd /home/ubuntu/Node
 
             # .env 파일 생성 (Prisma에서 DATABASE_URL을 인식할 수 있도록)
             echo "DATABASE_URL=$DATABASE_URL" > .env
-            echo "MYSQL_ROOT_PASSWORD" > .env
+            echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> .env
+            echo "EXPRESS_SESSION_SECRET=${{ secrets.EXPRESS_SESSION_SECRET }}" >> .env
+            echo "PASSPORT_NAVER_CLIENT_ID=${{ secrets.PASSPORT_NAVER_CLIENT_ID }}" >> .env
+            echo "PASSPORT_NAVER_CLIENT_SECRET=${{ secrets.PASSPORT_NAVER_CLIENT_SECRET }}" >> .env
+            echo "PASSPORT_KAKAO_CLIENT_ID=${{ secrets.PASSPORT_KAKAO_CLIENT_ID }}" >> .env
+            echo "PASSPORT_KAKAO_CLIENT_SECRET=${{ secrets.PASSPORT_KAKAO_CLIENT_SECRET }}" >> .env
+            echo "AWS_SECRET_ACCESS_KEY"="${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+            echo "AWS_REGION"="${{ secrets.AWS_REGION }}" >> .env
+            echo "AWS_ACCESS_KEY_ID"="${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+
 
             # Prisma 마이그레이션
             if [ -f "prisma/schema.prisma" ]; then
