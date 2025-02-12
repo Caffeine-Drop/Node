@@ -1,6 +1,5 @@
 node_modules
-prisma
+prisma/migrations
 package.json
-.github
 .env
-.github
+
