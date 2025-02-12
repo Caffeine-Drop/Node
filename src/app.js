@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+//카페 전체 조회 미들웨어
 import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
+//카페 정렬 미들웨어
+import cafeSortMiddleware from './middlewares/cafeSort_middleware.js';
 import responseMiddleware from './middlewares/responseMiddleware.js';
 
 const app = express();
@@ -18,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(responseMiddleware);
 // 카페 전체정보 조회 미들웨어
 app.use(cafeCheckMiddleware);
+//카페 정렬 미들웨어
+app.use(cafeSortMiddleware);
 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');

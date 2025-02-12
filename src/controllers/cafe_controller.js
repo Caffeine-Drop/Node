@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { readCafeInfos } from '../services/cafe_service.js';
+import { InternalServerError, NotFoundError } from '../error/error.js';
 
 export const handleReadCafes = async (req, res, next) => {
   try {
@@ -16,8 +17,16 @@ export const handleReadCafes = async (req, res, next) => {
     // 카페 정보 반환
     return res.status(200).json(cafe);
   } catch (error) {
-    console.error(error);
-    // 에러 발생 시 처리
-    return res.status(500).json({ error: error.message });
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({ message: error.message });
+    }
+
+    if (error instanceof InternalServerError) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    return res
+      .status(500)
+      .json({ message: '알 수 없는 에러', error: error.message });
   }
 };
