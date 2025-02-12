@@ -60,8 +60,7 @@ export const changeNickname = async (req, res) => {
 export const getUserInfo = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const userId = parseInt(user_id, 10);
-    const user = await user_service.getUserInfo(userId);
+    const user = await user_service.getUserInfo(user_id);
     return res.success(user);
   } catch (error) {
     if (error instanceof NotFoundError) {
