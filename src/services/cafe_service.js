@@ -17,6 +17,6 @@ export class readCafeInfos {
 
   static async getCafe() {
     const cafes = await CafeRepository.findCafe();
-    return cafes.map(cafe => cafe.id);
+    return cafes.map(cafe => cafe.cafe_id);
   }
 }
