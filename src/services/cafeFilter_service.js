@@ -1,8 +1,8 @@
 import { CafeRepository } from '../repositories/cafeFilter_repository.js';
 
 export class CafeService {
-  async getCafesByOperatingHours(filterDto) {
-    const { dayOfWeek, time } = filterDto;
-    return await CafeRepository.findCafesByOperatingHours(dayOfWeek, time);
+  async getCafesByFilters(filterDto) {
+    // console.log('filterDto in service:', filterDto);
+    return await CafeRepository.findCafesByFilters(filterDto);
   }
 }
