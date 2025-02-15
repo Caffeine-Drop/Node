@@ -1,4 +1,5 @@
-import { prisma } from "../db.config.js";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 import { InternalServerError } from "../error/error.js";
 
 //service 계층에서 전달받은 닉네임이 데이터베이스에 존재하는지를 확인하여 중복여부를 확인하기 위한 함수
