@@ -12,7 +12,7 @@ export const naverStrategy = new NaverStrategy(
   {
     clientID: process.env.PASSPORT_NAVER_CLIENT_ID,  
     clientSecret: process.env.PASSPORT_NAVER_CLIENT_SECRET, 
-    callbackURL: "http://13.124.11.195:3000/oauth2/callback/naver", //인증 후 콜백 URL
+    callbackURL: "https://auth.expo.io/@m_jin_2/CaffeineDrop", //인증 후 콜백 URL
     scope: ["profile", "email"], //요청할 권한
   },
   (accessToken, refreshToken, profile, cb) => {
@@ -40,7 +40,7 @@ const naverVerify = async (profile, accessToken, refreshToken) => {
         email,
         email_type: "naver",
         nickname: profile.name || " ",  // 프로필 이름이 없으면 빈 문자열로 처리
-        profile_image_url: profile.profile_image,  // 프로필 이미지 URL 저장
+        profile_image_url: profile.profile_image || " ",  // 프로필 이미지 URL 저장
         created_at: new Date(),
         updated_at: new Date(),
     },
@@ -56,7 +56,7 @@ export const kakaoStrategy = new KakaoStrategy(
   {
     clientID: process.env.PASSPORT_KAKAO_CLIENT_ID,  
     clientSecret: process.env.PASSPORT_KAKAO_CLIENT_SECRET,
-    callbackURL: "http://13.124.11.195:3000/oauth2/callback/kakao", //인증 후 콜백 URL
+    callbackURL: "https://auth.expo.io/@m_jin_2/CaffeineDrop", //인증 후 콜백 URL
   },
   (accessToken, refreshToken, profile, cb) => {
     return kakaoVerify(profile, accessToken, refreshToken) //프로필을 이용해 유저를 검증하고, 반환된 유저 정보를 콜백함수로 전달
@@ -83,7 +83,7 @@ const kakaoVerify = async (profile, accessToken, refreshToken) => {
         email,
         email_type: "kakao",
         nickname: profile.name || " ", //프로필 이름이 없으면 빈 문자열로 저장
-        profile_image_url: profile.profile_image,  //프로필 이미지 URL 저장
+        profile_image_url: profile.profile_image || " ",  //프로필 이미지 URL 저장
         created_at: new Date(),
         updated_at: new Date(),
       },
