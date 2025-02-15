@@ -3,9 +3,16 @@ import prisma from "../prisma.js";
 /// 특정 카페의 리뷰 목록을 가져오는 레포지토리
 export const getReviews = async (cafeId, offset, limit) => {
   return prisma.review.findMany({
+
     where: { cafe_id: (cafeId) },
     skip: (offset),
     take: (limit),
+    where: { 
+      cafe_id: Number(cafeId),
+      user_id: userId,
+    },
+    skip: Number(offset),
+    take: Number(limit),
     orderBy: { created_at: "desc" },
     select: {
       review_id: true,
