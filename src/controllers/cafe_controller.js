@@ -44,17 +44,3 @@ export const readAllCafe = async (req, res, next) => {
       .json({ message: '알 수 없는 에러', error: error.message });
   }
 };
-
-export const readAllCafe = async (req, res, next) => {
-  try {
-    const cafes = await readCafeInfos.getCafe();
-    return res.status(200).json({
-      message: '전체 카페 id 반환',
-      cafeList: cafes,
-    });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: '알 수 없는 에러', error: error.message });
-  }
-};
