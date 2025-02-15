@@ -19,6 +19,7 @@ router.get(
 		req.session.refreshToken = refreshToken; //DB 세션 테이블에서 data에 들어간다
 
 		res.success({ id, accessToken, refreshToken });
+		res.redirect("https://auth.expo.io/@m_jin_2/CaffeineDrop");
 	}
 );
 
@@ -37,6 +38,7 @@ router.get(
 		req.session.refreshToken = refreshToken; //DB 세션 테이블에서 data에 들어간다
 
 		res.success({ id, accessToken, refreshToken });
+		res.redirect("https://auth.expo.io/@m_jin_2/CaffeineDrop");
 	}
 );
 
