@@ -1,19 +1,19 @@
 import express from "express";
 import cors from "cors";
-import dotenv from 'dotenv';
-import responseMiddleware from './middlewares/responseMiddleware.js';
-import searchMiddleware from './middlewares/search_route.js';
-import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
-import likeMiddelware from './middlewares/like_route.js';
-import userRouter from './routes/userRouter.js'; // 사용자 관련 라우터 import
-import authRouter from './routes/authRouter.js'; // 연동 로그인 인증 관련 라우터 import
-import { setupPassport } from './auth.js'; // auth.js에서 Passport 설정 import
-import cafeBeanMiddleware from './middlewares/cafeBean_middleware.js';
+import dotenv from "dotenv";
+import responseMiddleware from "./middlewares/responseMiddleware.js";
+import searchMiddleware from "./middlewares/search_route.js";
+import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
+import likeMiddelware from "./middlewares/like_route.js";
+import userRouter from "./middlewares/userRouter.js"; // 사용자 관련 라우터 import
+import authRouter from "./routes/authRouter.js"; // 연동 로그인 인증 관련 라우터 import
+import { setupPassport } from "./auth.js"; // auth.js에서 Passport 설정 import
+import cafeBeanMiddleware from "./middlewares/cafeBean_middleware.js";
 import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 import { NotFoundError } from "./error/error.js";
 
 dotenv.config();
@@ -46,17 +46,17 @@ app.use(express.urlencoded({ extended: true }));
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
 // Passport와 세션 미들웨어 설정
-setupPassport(app);  // auth.js에서 설정된 Passport 및 세션 설정 적용
+setupPassport(app); // auth.js에서 설정된 Passport 및 세션 설정 적용
 
 // 카페 전체정보 조회 미들웨어
 app.use(cafeCheckMiddleware);
 // 검색 관련 API 미들웨어
-app.use('/search', searchMiddleware);
+app.use("/search", searchMiddleware);
 // 좋아요 관련 API 미들웨어
 app.use("/like", likeMiddelware);
 // 사용자 관련 라우터 연동
-app.use('/users', userRouter);
-app.use('/oauth2', authRouter);
+app.use("/users", userRouter);
+app.use("/oauth2", authRouter);
 // 원두 관련 API 미들웨어
 app.use(cafeBeanMiddleware);
 
