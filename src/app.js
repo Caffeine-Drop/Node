@@ -5,7 +5,7 @@ import responseMiddleware from "./middlewares/responseMiddleware.js";
 import searchMiddleware from "./middlewares/search_route.js";
 import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
 import likeMiddelware from "./middlewares/like_route.js";
-import userRouter from "./middlewares/userRouter.js"; // 사용자 관련 라우터 import
+import userRouter from "./routes/userRouter.js"; // 사용자 관련 라우터 import
 import authRouter from "./routes/authRouter.js"; // OAuth2 관련 라우터 import
 import { setupPassport } from "./auth.js"; // auth.js에서 Passport 설정 import
 import cafeBeanMiddleware from "./middlewares/cafeBean_middleware.js";
