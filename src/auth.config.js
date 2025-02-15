@@ -40,7 +40,7 @@ const naverVerify = async (profile, accessToken, refreshToken) => {
         email,
         email_type: "naver",
         nickname: profile.name || " ",  // 프로필 이름이 없으면 빈 문자열로 처리
-        profile_image_url: profile.profile_image,  // 프로필 이미지 URL 저장
+        profile_image_url: profile.profile_image || " ",  // 프로필 이미지 URL 저장
         created_at: new Date(),
         updated_at: new Date(),
     },
@@ -82,7 +82,7 @@ const kakaoVerify = async (profile, accessToken, refreshToken) => {
         email,
         email_type: "kakao",
         nickname: profile.name || " ", //프로필 이름이 없으면 빈 문자열로 저장
-        profile_image_url: profile.profile_image,  //프로필 이미지 URL 저장
+        profile_image_url: profile.profile_image || " ",  //프로필 이미지 URL 저장
         created_at: new Date(),
         updated_at: new Date(),
       },
