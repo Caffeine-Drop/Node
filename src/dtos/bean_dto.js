@@ -7,18 +7,11 @@ export const cafeBeanDto = (params) => {
 
 export const responseToPreffedBean = ({params, body}) => {
   return{
-    user_id: Number(params.user_id),
+    user_id: String(params),
     roasting_id: Number(body.roasting_id),
     aroma: body.aroma,
     acidity: body.acidity,
     body: body.body,
     country: body.country
-  }
-}
-
-export const preferredBeanDto = (params) => {
-  return{
-    user_id: Number(params.user_id),
-    prefered_id: Number(params.prefered_id)
   }
 }
