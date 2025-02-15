@@ -4,6 +4,9 @@ import cors from 'cors';
 import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
 //카페 정렬 미들웨어
 import cafeSortMiddleware from './middlewares/cafeSort_middleware.js';
+//카페 필터링 미들웨어
+import cafeFilterMiddleware from './middlewares/cafeFilter_middleware.js';
+
 import responseMiddleware from './middlewares/responseMiddleware.js';
 
 const app = express();
@@ -19,11 +22,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // 표준 응답 미들웨어
 app.use(responseMiddleware);
+//카페 필터링 미들웨어
+app.use(cafeFilterMiddleware);
 // 카페 전체정보 조회 미들웨어
 app.use(cafeCheckMiddleware);
 //카페 정렬 미들웨어
 app.use(cafeSortMiddleware);
-
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
