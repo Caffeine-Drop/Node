@@ -1489,7 +1489,7 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
-    /users/{user_id}:
+  /users/{user_id}:
     get:
       tags:
         - Users
