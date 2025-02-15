@@ -4,7 +4,7 @@ export const prisma = new PrismaClient();
 // 선호원두 추가하는 함수
 export const addPreferredBean = async (data) => {
   const result = await prisma.PreferedUserBean.create({ data: data });
-  return result.roasting_id;
+  return result;
 }
 
 // 선호원두 조회하는 함수 (유저아이디로 다중조회)
