@@ -1,14 +1,14 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import responseMiddleware from "./middlewares/responseMiddleware.js";
-import searchMiddleware from "./middlewares/search_route.js";
-import cafeCheckMiddleware from "./middlewares/cafeCheck_middleware.js";
-import likeMiddelware from "./middlewares/like_route.js";
-import userRouter from "./routes/userRouter.js"; // 사용자 관련 라우터 import
-import authRouter from "./routes/authRouter.js"; // OAuth2 관련 라우터 import
-import { setupPassport } from "./auth.js"; // auth.js에서 Passport 설정 import
-import cafeBeanMiddleware from "./middlewares/cafeBean_middleware.js";
+import dotenv from 'dotenv';
+import responseMiddleware from './middlewares/responseMiddleware.js';
+import searchMiddleware from './middlewares/search_route.js';
+import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
+import likeMiddelware from './middlewares/like_route.js';
+import userRouter from './middlewares/userRouter.js'; // 사용자 관련 라우터 import
+import authRouter from './middlewares/authRouter.js'; // 연동 로그인 인증 관련 라우터 import
+import { setupPassport } from './auth.js'; // auth.js에서 Passport 설정 import
+import cafeBeanMiddleware from './middlewares/cafeBean_middleware.js';
 import swaggerUi from "swagger-ui-express";
 import yaml from "js-yaml";
 import fs from "fs";
