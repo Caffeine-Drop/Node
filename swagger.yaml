@@ -1095,7 +1095,9 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
+
   /users/{user_id}/preferred-beans:
+  /users/preferred-beans:
     get:
       tags:
         - Preferences
@@ -1109,6 +1111,18 @@ paths:
           schema:
             type: integer
             example: 1
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
       responses:
         "200":
           description: 선호원두 정보 조회 성공
@@ -1227,7 +1241,9 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
+
   /users/{user_id}/preferred-bean:
+  /users/preferred-bean:
     post:
       tags:
         - Preferences
@@ -1241,6 +1257,18 @@ paths:
           schema:
             type: integer
             example: 1
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
       requestBody:
         required: true
         content:
@@ -1371,6 +1399,7 @@ paths:
                         type: string
                         example: "서버 에러"
     /users/{user_id}/preferred-bean/{prefered_id}:
+    /users/preferred-bean/{prefered_id}:
     delete:
       tags:
         - Preferences
@@ -1384,6 +1413,18 @@ paths:
           schema:
             type: integer
             example: 1
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
         - in: path
           name: prefered_id
           required: true

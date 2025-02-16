@@ -12,7 +12,11 @@ export const naverStrategy = new NaverStrategy(
   {
     clientID: process.env.PASSPORT_NAVER_CLIENT_ID,  
     clientSecret: process.env.PASSPORT_NAVER_CLIENT_SECRET, 
+
     callbackURL: "http://13.124.11.195:3000/oauth2/callback/naver", //인증 후 콜백 URL
+
+    callbackURL: "http://13.124.11.195:3000/callback/naver", //인증 후 콜백 URL
+
     scope: ["profile", "email"], //요청할 권한
   },
   (accessToken, refreshToken, profile, cb) => {
