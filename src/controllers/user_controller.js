@@ -2,7 +2,7 @@ import * as user_service from "../services/user_service.js";
 import * as user_dto from "../dtos/user_dto.js";
 import { NotFoundError, ValidationError } from "../error/error.js";
 
-import s3 from '../config/s3Client.js';
+import s3 from '../config/s3client.js';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
