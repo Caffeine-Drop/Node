@@ -8,7 +8,7 @@ const service = new LikeService(likeRepository);
 class LikeController {
     // 카페 좋아요
     async favorCafe(req, res, next) {
-        const user_id = req.user_id;
+        const user_id = String(req.user_id);
         const cafe_id = Number(req.params.cafe_id);
 
 
