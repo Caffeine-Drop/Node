@@ -56,7 +56,7 @@ export const kakaoStrategy = new KakaoStrategy(
   {
     clientID: process.env.PASSPORT_KAKAO_CLIENT_ID,  
     clientSecret: process.env.PASSPORT_KAKAO_CLIENT_SECRET,
-    callbackURL: "http://localhost/oauth2/callback/kakao", //인증 후 콜백 URL
+    callbackURL: "http://13.124.11.195:3000/oauth2/callback/kakao", //인증 후 콜백 URL
   },
   (accessToken, refreshToken, profile, cb) => {
     return kakaoVerify(profile, accessToken, refreshToken) //프로필을 이용해 유저를 검증하고, 반환된 유저 정보를 콜백함수로 전달
