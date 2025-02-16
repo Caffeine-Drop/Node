@@ -47,3 +47,17 @@ export const getReviews = async (req, res) => {
     });
   }
 };
+
+export const getRating = async (req, res) => {
+  try {
+    const cafe_id = Number(req.params.cafe_id);
+    if (!cafe_id) {
+      return res.status(400).json({ message: '카페 아이디는 필수입니다.' });
+    }
+
+    const data = await reviewService.getRatings(cafe_id);
+    res.status(200).json({data});
+  } catch (error) {
+    console.error("Error in getReviews controller:", error);
+  }
+}

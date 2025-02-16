@@ -1,15 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import reviewMiddleware from './middlewares/reviewMiddleware.js';
 import responseMiddleware from './middlewares/responseMiddleware.js';
 import searchMiddleware from './middlewares/search_route.js';
-//카페 전체 조회 미들웨어
 import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
-//카페 정렬 미들웨어
 import cafeSortMiddleware from './middlewares/cafeSort_middleware.js';
-//카페 필터링 미들웨어
 import cafeFilterMiddleware from './middlewares/cafeFilter_middleware.js';
-// 선호도 관련 API 미들웨어
 import preferenceMiddleware from './middlewares/preference_middleware.js'; 
 import likeMiddelware from './middlewares/like_route.js';
 import userRouter from './middlewares/userRouter.js'; // 사용자 관련 라우터 import
@@ -72,6 +69,8 @@ app.use('/oauth2', authRouter);
 app.use(cafeBeanMiddleware);
 //카페 정렬 미들웨어
 app.use(cafeSortMiddleware);
+// 리뷰 조회 미들웨어
+app.use(reviewMiddleware);
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
