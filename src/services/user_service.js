@@ -63,3 +63,13 @@ export const getUserInfo = async (userId) => {
     throw new InternalServerError('사용자 정보 조회를 실패했습니다');
   }
 };
+
+//userId가 유효한 지 검증하고, repository에 정보를 넘겨주기 위한 함수
+export const updateProfileImage = async (userId, imageUrl) => {
+  if (!userId) {
+    throw new Error('유효하지 않은 사용자입니다.');
+  }
+  
+  const updatedUser = await user_repository.updateUserProfileImage(userId, imageUrl);
+  return updatedUser;
+};
