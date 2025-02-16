@@ -6,7 +6,7 @@ import { NotFoundError, ValidationError } from "../error/error.js";
 //검사결과를 응답하기 위한 함수
 export const checkNicknameOverlap = async (req, res) => {
 	try {
-		const { nickname } = req.params;
+		const nickname = req.body.nickname;
 		const validNickname = user_dto.checkNicknameDto(nickname);
 		const isNotOverlap = await user_service.checkNicknameOverlap(validNickname); //true(중복아님) or false(중복임)를 리턴
 		return res.success({ isNotOverlap });
@@ -22,13 +22,15 @@ export const checkNicknameOverlap = async (req, res) => {
 //생성 성공일 때 그 닉네임으로 응답해주기 위한 함수
 export const createNickname = async (req, res) => {
 	try {
-		const { userId, nickname } = req.body;
+		const nickname = req.body.nickname;
+		const userId = req.user_id;
 		const { userId: validUserId, nickname: validNickname } =
 			user_dto.createNicknameDto(userId, nickname);
 		const newNickname = await user_service.createNickname(
 			validUserId,
 			validNickname
 		);
+
 		return res.success({ nickname: newNickname }, 201); // 상태 코드 201을 사용하여 생성 성공 응답
 	} catch (error) {
 		if (error instanceof NotFoundError) {
@@ -44,7 +46,8 @@ export const createNickname = async (req, res) => {
 //변경 성공일 때 그 닉네임으로 응답해주기 위한 함수
 export const changeNickname = async (req, res) => {
 	try {
-		const { userId, newNickname } = req.body;
+		const userId = req.user_id;
+		const newNickname = req.body.nickname;
 		const { userId: validUserId, newNickname: validNewNickname } =
 			user_dto.changeNicknameDto(userId, newNickname);
 		const updatedNickname = await user_service.changeNickname(
@@ -66,7 +69,7 @@ export const changeNickname = async (req, res) => {
 //조회 성공일 때, 그 정보로 응답해주기 위한 함수
 export const getUserInfo = async (req, res) => {
 	try {
-		const { user_id } = req.params;
+		const user_id = req.user_id;
 		const user = await user_service.getUserInfo(user_id);
 		return res.success(user);
 	} catch (error) {
@@ -80,14 +83,15 @@ export const getUserInfo = async (req, res) => {
 //업로드된 파일 정보를 추출하고 인증 정보와 URL를 service에 전달하기 위한 함수
 export const uploadProfileImage = async (req, res, next) => {
 	try {
+
 	  // 파일이 업로드되지 않았을 경우 에러 처리
 	  if (!req.file || !req.file.location) {
 		return res.error(new ValidationError('파일 업로드에 실패했습니다.'), 400);
 	  }
 	  
 	  const imageUrl = req.file.location;  // S3에 저장된 이미지 URL
-	  const userId = req.user.user_id;   //세션에서 userId를 가져옴
-	  const updatedUser = await updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
+	  const userId = req.user_id;   //세션에서 userId를 가져옴
+	  const updatedUser = await user_service.updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
   
 	  return res.success({ user: updatedUser });
 	} catch (error) {
