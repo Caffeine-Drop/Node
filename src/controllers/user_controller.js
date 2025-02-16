@@ -83,14 +83,15 @@ export const getUserInfo = async (req, res) => {
 //업로드된 파일 정보를 추출하고 인증 정보와 URL를 service에 전달하기 위한 함수
 export const uploadProfileImage = async (req, res, next) => {
 	try {
+
 	  // 파일이 업로드되지 않았을 경우 에러 처리
 	  if (!req.file || !req.file.location) {
 		return res.error(new ValidationError('파일 업로드에 실패했습니다.'), 400);
 	  }
 	  
 	  const imageUrl = req.file.location;  // S3에 저장된 이미지 URL
-	  const userId = req.user.user_id;   //세션에서 userId를 가져옴
-	  const updatedUser = await updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
+	  const userId = req.user_id;   //세션에서 userId를 가져옴
+	  const updatedUser = await user_service.updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
   
 	  return res.success({ user: updatedUser });
 	} catch (error) {

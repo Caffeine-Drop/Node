@@ -70,6 +70,6 @@ export const updateProfileImage = async (userId, imageUrl) => {
     throw new Error('유효하지 않은 사용자입니다.');
   }
   
-  const updatedUser = await user_repository.updateUserProfileImage(userId, imageUrl);
+  const updatedUser = await user_repository.updateUserProfileImage(String(userId), imageUrl);
   return updatedUser;
 };
