@@ -9,7 +9,8 @@ import cafeCheckMiddleware from './middlewares/cafeCheck_middleware.js';
 import cafeSortMiddleware from './middlewares/cafeSort_middleware.js';
 //카페 필터링 미들웨어
 import cafeFilterMiddleware from './middlewares/cafeFilter_middleware.js';
-
+// 선호도 관련 API 미들웨어
+import preferenceMiddleware from './middlewares/preference_middleware.js'; 
 import likeMiddelware from './middlewares/like_route.js';
 import userRouter from './middlewares/userRouter.js'; // 사용자 관련 라우터 import
 import authRouter from './middlewares/authRouter.js'; // 연동 로그인 인증 관련 라우터 import
@@ -58,6 +59,8 @@ setupPassport(app); // auth.js에서 설정된 Passport 및 세션 설정 적용
 app.use(cafeFilterMiddleware);
 // 카페 전체정보 조회 미들웨어
 app.use(cafeCheckMiddleware);
+// 선호도 관련 API 미들웨어
+app.use(preferenceMiddleware);
 // 검색 관련 API 미들웨어
 app.use('/search', searchMiddleware);
 // 좋아요 관련 API 미들웨어

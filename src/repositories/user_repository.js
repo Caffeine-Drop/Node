@@ -53,3 +53,26 @@ export const changeNickname = async (userId, newNickname) => {
     throw new InternalServerError('닉네임 변경 오류');
   }
 };
+
+//service 계층에서 전달받은 userId와 imageUrl를 데이터베이스에 저장하기 위한 함수
+export const updateUserProfileImage = async (userId, imageUrl) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { user_id: userId },
+      data: { profile_image_url: imageUrl },
+    });
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 유저 정보를 조회하는 함수
+export const getUser = async (userId) => {
+  const user = await prisma.user.findUnique( { where: { user_id: userId} } );
+  if (!user) {
+      return null;
+  }
+  
+  return user;
+}
