@@ -5,6 +5,7 @@ import { authenticateToken } from "./authMiddleware.js";
 const router = express.Router();
 const controller = new LikeController();
 
-router.post("cafes/:cafe_id/like", authenticateToken, controller.favorCafe);
+router.post("/:cafe_id", authenticateToken, controller.favorCafe);
 
 export default router;
+    

@@ -19,7 +19,7 @@ router.get("", authenticateToken, userController.getUserInfo);
 
 // 프로필 이미지 등록 및 변경 API
 router.post(
-    '/profile-image', 
+    "/profile-image", 
     (req, res, next) => {
       req.dir = 'profile-images';  // req.dir 설정 미들웨어 (S3에 저장할 폴더 지정)
     next();
