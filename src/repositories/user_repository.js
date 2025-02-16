@@ -53,3 +53,13 @@ export const changeNickname = async (userId, newNickname) => {
     throw new InternalServerError('닉네임 변경 오류');
   }
 };
+
+// 유저 정보를 조회하는 함수
+export const getUser = async (userId) => {
+  const user = await prisma.user.findUnique( { where: { user_id: userId} } );
+  if (!user) {
+      return null;
+  }
+  
+  return user;
+}
