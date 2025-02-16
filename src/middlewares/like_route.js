@@ -8,3 +8,4 @@ const controller = new LikeController();
 router.post("/:cafe_id", authenticateToken, controller.favorCafe);
 
 export default router;
+    
