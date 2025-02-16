@@ -21,7 +21,7 @@ router.post(
     "/profile-image", 
     (req, res, next) => {
       req.dir = 'profile-images';  // req.dir 설정 미들웨어 (S3에 저장할 폴더 지정)
-    next();
+      next();
     },
     upload.single('profile-image'),
     userController.uploadProfileImage

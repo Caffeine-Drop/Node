@@ -87,7 +87,7 @@ export const uploadProfileImage = async (req, res, next) => {
 	  
 	  const imageUrl = req.file.location;  // S3에 저장된 이미지 URL
 	  const userId = req.user.user_id;   //세션에서 userId를 가져옴
-	  const updatedUser = await updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
+	  const updatedUser = await user_service.updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
   
 	  return res.success({ user: updatedUser });
 	} catch (error) {
