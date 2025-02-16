@@ -9,12 +9,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  user_id            Int               @id @default(autoincrement())
+  user_id            String            @id
   owner              Owner?         
   owner_id           Int?
   email              String            @unique
@@ -89,7 +89,7 @@ model Bean {
 model Review {
   review_id          Int               @id @default(autoincrement())
   user               User              @relation(fields: [user_id], references: [user_id])
-  user_id            Int
+  user_id            String
   cafe               Cafe              @relation(fields: [cafe_id], references: [cafe_id])
   cafe_id            Int
   content            String?
@@ -109,7 +109,7 @@ model ReviewImage {
 
 model CafeLike {
   user               User              @relation(fields: [user_id], references: [user_id])
-  user_id            Int
+  user_id            String
   cafe               Cafe              @relation(fields: [cafe_id], references: [cafe_id])
   cafe_id            Int
   liked_at           DateTime?         @default(now())
@@ -129,7 +129,7 @@ model SearchTerm {
 model RecentSearch {
   recent_search_id   Int               @id @default(autoincrement())
   user               User              @relation(fields: [user_id], references: [user_id])
-  user_id            Int
+  user_id            String
   search_term        String
   searched_at        DateTime?
 }
@@ -137,7 +137,7 @@ model RecentSearch {
 model Owner {
   owner_id           Int               @id @default(autoincrement())
   user               User?             @relation(fields: [user_id], references: [user_id])
-  user_id            Int               @unique
+  user_id            String            @unique
   cafe               Cafe[]
   cafe_id            Int               @unique
   business_certification_number Int
@@ -209,7 +209,7 @@ model SingleOrigin {
 model PreferedUserBean {
   prefered_id        Int               @id @default(autoincrement())
   user               User              @relation(fields: [user_id], references: [user_id])
-  user_id            Int
+  user_id            String
   roasting           Roasting          @relation(fields: [roasting_id], references: [roasting_id])
   roasting_id        Int
   aroma              Int?
@@ -244,7 +244,7 @@ model Roasting {
 model Session {
   id        String   @id
   sid       String   @unique
-  data      String   @db.VarChar(512)
+  data      String   @db.Text
   expiresAt DateTime @map("expires_at")
 
   @@map("session")

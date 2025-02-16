@@ -1,14 +1,16 @@
 # Node
+
 Caffeine Drop Node 리포지토리 입니다.
 
 ## 0. 최신 변경사항 불러오기
 
 ```
 git stash                     // 현재 변경사항 임시 저장하기
-git fetch origin              // 최신 변경사항 가져오기
-git branch                    // 현재 어떤 브랜치에 있는지 확인하세요!!
+git fetch origin develop      // 최신 변경사항 가져오기
+git branch                    // 현재 어떤 브랜치에 있는지 확인하세요!! 작업중인 브랜치로 이동해야 합니다.
 git merge origin/develop      // develop 브랜치 최신 변경사항을 머지합니다.
 ```
+
 이렇게 하면 프로젝트의 최신 변경사항을 유지할 수 있습니다.
 만약 충돌이 나는 경우 적절히 처리하세요. (혹은 팀장 부르기)
 
@@ -36,6 +38,7 @@ src/
 ```
 
 ### 각 폴더의 역할
+
 - **`app.js`**  
   애플리케이션의 진입점으로, Express 앱을 초기화하고 미들웨어와 라우트를 설정합니다.
 
@@ -83,16 +86,18 @@ src/
 ### 응답 형식
 
 #### 성공 응답
+
 - **형식**:
   ```json
   {
-    "result": "Success",
-    "status": 200,
-    "success": { "key": "value" },
-    "error": null
+  	"result": "Success",
+  	"status": 200,
+  	"success": { "key": "value" },
+  	"error": null
   }
   ```
 - **설명**:
+
   - `result`: 요청이 성공했음을 나타냅니다.
   - `status`: HTTP 상태 코드를 나타냅니다.
   - `success`: 요청 처리 결과 데이터를 포함합니다.
@@ -101,27 +106,29 @@ src/
 - **예시**:
   ```json
   {
-    "result": "Success",
-    "status": 200,
-    "success": { "message": "User created successfully" },
-    "error": null
+  	"result": "Success",
+  	"status": 200,
+  	"success": { "message": "User created successfully" },
+  	"error": null
   }
   ```
 
 #### 실패 응답
+
 - **형식**:
   ```json
   {
-    "result": "Fail",
-    "status": 400,
-    "success": null,
-    "error": {
-      "errorCode": "CustomErrorName",
-      "message": "Error message"
-    }
+  	"result": "Fail",
+  	"status": 400,
+  	"success": null,
+  	"error": {
+  		"errorCode": "CustomErrorName",
+  		"message": "Error message"
+  	}
   }
   ```
 - **설명**:
+
   - `result`: 요청이 실패했음을 나타냅니다.
   - `status`: HTTP 상태 코드를 나타냅니다.
   - `success`: 항상 `null`입니다.
@@ -132,19 +139,20 @@ src/
 - **예시**:
   ```json
   {
-    "result": "Fail",
-    "status": 404,
-    "success": null,
-    "error": {
-      "errorCode": "NotFoundError",
-      "message": "User not found"
-    }
+  	"result": "Fail",
+  	"status": 404,
+  	"success": null,
+  	"error": {
+  		"errorCode": "NotFoundError",
+  		"message": "User not found"
+  	}
   }
   ```
 
 ---
 
 ## 3. 주의사항
+
 - 모든 컨트롤러에서 응답을 반환할 때는 반드시 **`res.success`** 또는 **`res.error`**를 사용하세요.
 - 에러를 발생시킬 때는 `throw`를 사용하고, 적절한 사용자 정의 에러 클래스를 활용하세요.
   - 예: `throw new ValidationError("Invalid input")`.

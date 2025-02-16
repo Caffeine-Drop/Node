@@ -1,0 +1,1972 @@
+openapi: 3.0.0
+info:
+  title: Caffeine Drop API
+  version: 1.0.0
+  description: Caffeine Drop API 문서
+paths:
+  /search:
+    get:
+      tags:
+        - Search
+      summary: 검색어를 통한 메뉴 이름, 가게명, 지역 검색
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+        - in: query
+          name: keyword
+          required: true
+          description: 검색 키워드
+          schema:
+            type: string
+            example: "커피"
+        - in: query
+          name: lat
+          required: true
+          description: 위도
+          schema:
+            type: number
+            format: float
+            example: 37.517236
+        - in: query
+          name: lng
+          required: true
+          description: 경도
+          schema:
+            type: number
+            format: float
+            example: 127.047324
+        - in: query
+          name: radius
+          required: true
+          description: 검색 범위 (km)
+          schema:
+            type: integer
+            example: 5
+      responses:
+        "200":
+          description: 검색 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "검색 완료"
+                  term:
+                    type: string
+                    example: "커피"
+                  list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cafe_id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "카페 A"
+        "400":
+          description: 검색어 미제공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "검색어는 필수입니다."
+        "401":
+          description: 인증 실패 (토큰 없음)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰이 필요합니다."
+        "403":
+          description: 인증 실패 (유효하지 않은 토큰)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유효하지 않은 토큰입니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버 에러"
+  /search/rank:
+    get:
+      tags:
+        - Search
+      summary: 검색량이 많은 상위 6개의 검색어와 집계시간 반환
+      description: 검색량이 많은 상위 6개의 검색어와 집계시간 반환하는 API
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+        - in: query
+          name: untilTime
+          required: true
+          description: 검색 기준 시간
+          schema:
+            type: string
+            example: "2025-01-26T12:00:00Z"
+      responses:
+        "200":
+          description: 상위 6개 검색어와 기준 시간 반환
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "인기 검색어 6개 반환 완료"
+                  terms:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      ["커피", "카페", "디저트", "브런치", "케이크", "베이커리"]
+                  untilTime:
+                    type: string
+                    format: date-time
+                    example: "2025-01-30 23:59:59"
+        "400":
+          description: 유효하지 않은 입력 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "시간은 필수이며 YYYY-MM-DD HH:mm:ss 형식입니다."
+        "401":
+          description: 인증 실패 (토큰 없음)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰이 필요합니다."
+        "403":
+          description: 인증 실패 (유효하지 않은 토큰)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유효하지 않은 토큰입니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버 에러"
+  /search/recent:
+    get:
+      tags:
+        - Search
+      summary: 내가 최근에 검색했던 검색어를 반환하는 API
+      description: 사용자의 최근 검색어를 최대 10개까지 반환합니다
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: 토큰에서 추출한 유저 아이디
+          schema:
+            type: string
+            example: "Bearer {토큰}"
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+      responses:
+        "200":
+          description: 유저별 최근 검색어 10개 반환
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유저별 최근 검색어 10개 반환 완료"
+                  terms:
+                    type: array
+                    items:
+                      type: string
+                    example: ["카페", "맛집", "디저트", "브런치", "케이크"]
+        "401":
+          description: 인증 실패 (토큰 없음)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰이 필요합니다."
+        "403":
+          description: 인증 실패 (유효하지 않은 토큰)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유효하지 않은 토큰입니다."
+        "404":
+          description: 최근 검색어 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "최근 검색어가 없습니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버 에러"
+  /search/recent/delete:
+    delete:
+      tags:
+        - Search
+      summary: 내가 최근에 검색했던 특정 검색어 1개를 삭제하는 API
+      description: 사용자의 최근 검색어 중 특정 검색어 하나를 삭제합니다
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: 토큰에서 추출한 유저 아이디
+          schema:
+            type: string
+            example: "Bearer {토큰}"
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+        - in: query
+          name: keyword
+          required: true
+          description: 삭제할 검색어
+          schema:
+            type: string
+            example: "커피"
+      responses:
+        "200":
+          description: 검색어 삭제 완료
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유저별 최근 검색어 삭제 완료 (1개)"
+                  deleteTerm:
+                    type: string
+                    example: "커피"
+        "400":
+          description: 검색어 미제공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "검색어는 필수입니다."
+        "401":
+          description: 인증 실패 (토큰 없음)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰이 필요합니다."
+        "403":
+          description: 인증 실패 (유효하지 않은 토큰)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유효하지 않은 토큰입니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버 에러"
+  /search/recent/delete/all:
+    delete:
+      tags:
+        - Search
+      summary: 내가 최근에 검색했던 검색어 전체를 삭제하는 API
+      description: 사용자의 모든 최근 검색어를 삭제합니다
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: 토큰에서 추출한 유저 아이디
+          schema:
+            type: string
+            example: "Bearer {토큰}"
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+      responses:
+        "200":
+          description: 모든 검색어 삭제 완료
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유저별 최근 검색어 삭제 완료 (전체)"
+        "400":
+          description: 검색어 미제공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "검색어는 필수입니다."
+        "401":
+          description: 인증 실패 (토큰 없음)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰이 필요합니다."
+        "403":
+          description: 인증 실패 (유효하지 않은 토큰)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "유효하지 않은 토큰입니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버 에러"
+  /cafes/ids:
+    get:
+      summary: "전체 카페 ID 반환"
+      description: "전체 카페의 ID를 반환합니다."
+      operationId: "getCafeIds"
+      tags:
+        - "Cafes"
+      responses:
+        "200":
+          description: "전체 카페 ID 목록 반환 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "전체 카페 id 반환"
+                  cafeList:
+                    type: array
+                    items:
+                      type: string
+                      example: "cafe123"
+        "500":
+          description: "알 수 없는 에러 발생"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버에서 알 수 없는 에러 발생"
+  /cafes/{cafe_id}:
+    get:
+      tags:
+        - Cafes
+      summary: 특정 카페 정보 조회
+      description: 특정 카페의 상세 정보를 반환하는 API입니다.
+      parameters:
+        - in: path
+          name: cafe_id
+          required: true
+          description: 조회할 카페 ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 카페 상세 정보 반환
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cafe_id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: "카페 A"
+                  address:
+                    type: string
+                    example: "서울시 강남구 어딘가"
+                  phone:
+                    type: string
+                    example: "02-1234-5678"
+                  opening_hours:
+                    type: string
+                    example: "09:00 - 22:00"
+                  rating:
+                    type: number
+                    format: float
+                    example: 4.5
+                  menu:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        menu_id:
+                          type: integer
+                          example: 101
+                        name:
+                          type: string
+                          example: "아메리카노"
+                        price:
+                          type: integer
+                          example: 4000
+        "400":
+          description: 유효하지 않은 카페 ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid cafeId"
+        "404":
+          description: 해당 ID의 카페 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "해당 카페를 찾을 수 없습니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "서버 에러 발생"
+  /cafes/{cafe_id}/like:
+    post:
+      tags:
+        - Cafes
+      summary: 특정 카페 좋아요 기능
+      description: 사용자가 특정 카페를 좋아요하는 기능
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: cafe_id
+          required: true
+          description: 좋아요할 카페 ID
+          schema:
+            type: integer
+            example: 1
+        - in: header
+          name: Authorization
+          required: true
+          description: Bearer 토큰 (JWT 인증)
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR..."
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 (네이버 또는 카카오)
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+      responses:
+        "200":
+          description: 좋아요 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "좋아요 완료"
+                  user_id:
+                    type: integer
+                    example: 12345
+                  cafe_id:
+                    type: integer
+                    example: 1
+        "400":
+          description: 잘못된 요청 (유효하지 않은 user_id 또는 cafe_id)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "카페 아이디는 필수이며 숫자여야 합니다."
+        "401":
+          description: 인증 실패 (토큰 없음)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰이 필요합니다."
+        "403":
+          description: 인증 실패 (유효하지 않은 토큰)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "토큰 검증 실패"
+                  error:
+                    type: string
+                    example: "유효하지 않은 토큰 형식입니다."
+        "404":
+          description: 해당 카페 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "해당 카페를 찾을 수 없습니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "알 수 없는 에러"
+                  error:
+                    type: string
+                    example: "서버 에러 발생"
+  /cafes/{cafe_id}/beans:
+    get:
+      tags:
+        - "Cafe Beans"
+      summary: 특정 카페의 보유 원두 정보를 조회하는 API
+      description: 카페의 보유원두정보, 스페셜티정보, 원두-태그 연결관계, 태그정보를 조회합니다.
+      parameters:
+        - in: path
+          name: cafe_id
+          required: true
+          description: 조회하고자 하는 카페의 id값
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 카페 원두 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      bean:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            bean_id:
+                              type: integer
+                              example: 2
+                            roasting_id:
+                              type: integer
+                              example: 2
+                            name:
+                              type: string
+                              example: "Light Roast"
+                            is_specialty:
+                              type: boolean
+                              example: false
+                            description:
+                              type: string
+                              example: "A mild and bright flavor profile"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2025-01-19T19:40:34.000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2025-01-19T19:40:34.000Z"
+                            is_single_origin:
+                              type: boolean
+                              example: false
+                      single_origin:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            single_id:
+                              type: integer
+                              example: 4
+                            bean_id:
+                              type: integer
+                              example: 5
+                            rating:
+                              type: integer
+                              minimum: 0
+                              maximum: 100
+                              example: 80
+                            aroma:
+                              type: integer
+                              minimum: 0
+                              maximum: 5
+                              example: 4
+                            acidity:
+                              type: integer
+                              minimum: 0
+                              maximum: 5
+                              example: 4
+                            sweetness:
+                              type: integer
+                              minimum: 0
+                              maximum: 5
+                              example: 2
+                            balance:
+                              type: integer
+                              minimum: 0
+                              maximum: 5
+                              example: 5
+                            body:
+                              type: integer
+                              minimum: 0
+                              maximum: 5
+                              example: 5
+                      bean_tag:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            bean_id:
+                              type: integer
+                              example: 2
+                            cuffing_tag_id:
+                              type: integer
+                              example: 1
+                      cuffingTag:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            cuffing_tag_id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: "Fruity"
+                  error:
+                    type: null
+                    example: null
+        "404":
+          description: 요청한 카페를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "카페를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+  /cafes/{cafe_id}/beans/{bean_id}:
+    post:
+      tags:
+        - Cafe Beans
+      summary: 특정 카페의 보유 원두 정보를 추가하는 API
+      description: 카페에 새로운 원두를 추가합니다.
+      parameters:
+        - in: path
+          name: cafe_id
+          required: true
+          description: 조회하고자 하는 카페 id값
+          schema:
+            type: integer
+            example: 1
+        - in: path
+          name: bean_id
+          required: true
+          description: 추가하고자 하는 원두 id 값
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 원두 정보 추가 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      cafe_id:
+                        type: integer
+                        example: 2
+                      bean_id:
+                        type: integer
+                        example: 5
+                      added_at:
+                        type: string
+                        format: date-time
+                        example: "2025-01-27T06:15:18.437Z"
+                  error:
+                    type: null
+                    example: null
+        "400":
+          description: 이미 등록된 데이터
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 400
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "ValidationError"
+                      message:
+                        type: string
+                        example: "이미 등록된 카페와 원두입니다."
+        "404":
+          description: 요청한 데이터를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "카페를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+  /cafes/{cafe_id}/specialty:
+    get:
+      tags:
+        - Cafe Beans
+      summary: 카페의 스페셜티 인증커피 보유여부를 조회하는 API
+      description: 특정 카페의 스페셜티 인증커피 보유 여부를 확인합니다.
+      parameters:
+        - in: path
+          name: cafe_id
+          required: true
+          description: 조회하고자 하는 카페의 id값
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 스페셜티 인증커피 보유여부 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: boolean
+                    description: 스페셜티 인증커피 보유 여부
+                  error:
+                    type: null
+                    example: null
+              examples:
+                hasSpecialty:
+                  summary: 스페셜티 커피 보유
+                  value:
+                    result: "Success"
+                    status: 200
+                    success: true
+                    error: null
+                noSpecialty:
+                  summary: 스페셜티 커피 미보유
+                  value:
+                    result: "Success"
+                    status: 200
+                    success: false
+                    error: null
+        "404":
+          description: 요청한 카페를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "카페를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+  /users/preferred-beans:
+    get:
+      tags:
+        - Preferences
+      summary: 특정 사용자의 선호원두 정보를 조회하는 API
+      description: 사용자의 모든 선호 원두 정보를 조회합니다.
+      parameters:
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+      responses:
+        "200":
+          description: 선호원두 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        prefered_id:
+                          type: integer
+                          example: 8
+                        user_id:
+                          type: integer
+                          example: 1
+                        roasting_id:
+                          type: integer
+                          example: 1
+                        aroma:
+                          type: integer
+                          minimum: 0
+                          maximum: 5
+                          example: 5
+                        acidity:
+                          type: integer
+                          minimum: 0
+                          maximum: 5
+                          example: 5
+                        body:
+                          type: integer
+                          minimum: 0
+                          maximum: 5
+                          example: 5
+                        country:
+                          type: string
+                          example: "베트남"
+                  error:
+                    type: null
+                    example: null
+              example:
+                result: "Success"
+                status: 200
+                success:
+                  - prefered_id: 8
+                    user_id: 1
+                    roasting_id: 1
+                    aroma: 5
+                    acidity: 5
+                    body: 5
+                    country: "베트남"
+                  - prefered_id: 9
+                    user_id: 1
+                    roasting_id: 2
+                    aroma: 5
+                    acidity: 5
+                    body: 4
+                    country: "인도네시아"
+                error: null
+        "404":
+          description: 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "유저를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+  /users/preferred-bean:
+    post:
+      tags:
+        - Preferences
+      summary: 특정 사용자의 선호원두 정보를 생성하는 API
+      description: 사용자의 원두 선호도 정보(로스팅, 향, 산미, 바디감, 원산지)를 생성합니다.
+      parameters:
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - roasting_id
+                - aroma
+                - acidity
+                - body
+                - country
+              properties:
+                roasting_id:
+                  type: integer
+                  minimum: 0
+                  maximum: 8
+                  description: 선호하는 로스팅 정도
+                  example: 2
+                aroma:
+                  type: integer
+                  minimum: 0
+                  maximum: 5
+                  description: 선호하는 향 정도
+                  example: 4
+                acidity:
+                  type: integer
+                  minimum: 0
+                  maximum: 5
+                  description: 선호하는 산미 정도
+                  example: 4
+                body:
+                  type: integer
+                  minimum: 0
+                  maximum: 5
+                  description: 선호하는 바디감 정도
+                  example: 5
+                country:
+                  type: string
+                  description: 선호 원두의 원산지
+                  example: "베트남"
+      responses:
+        "200":
+          description: 선호원두 데이터 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: integer
+                    example: 1
+                  error:
+                    type: null
+                    example: null
+        "404":
+          description: 요청한 정보를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+              examples:
+                userNotFound:
+                  summary: 유저를 찾을 수 없음
+                  value:
+                    result: "Fail"
+                    status: 404
+                    success: null
+                    error:
+                      errorCode: "NotFoundError"
+                      message: "유저를 찾을 수 없습니다."
+                roastingNotFound:
+                  summary: 로스팅 정보를 찾을 수 없음
+                  value:
+                    result: "Fail"
+                    status: 404
+                    success: null
+                    error:
+                      errorCode: "NotFoundError"
+                      message: "로스팅 정보를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+    /users/preferred-bean/{prefered_id}:
+    delete:
+      tags:
+        - Preferences
+      summary: 특정 사용자의 선호원두 정보를 삭제하는 API
+      description: 사용자의 특정 선호 원두 정보를 삭제합니다.
+      parameters:
+        - in: header
+          name: Authorization
+          description: 토큰에서 추출한 유저 아이디
+        - in: header
+          name: provider
+          required: true
+          description: 로그인 플랫폼 구분
+          schema:
+            type: string
+            enum:
+              - naver
+              - kakao
+        - in: path
+          name: prefered_id
+          required: true
+          description: 선호원두 id
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 선호원두 정보 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "선호원두 정보가 성공적으로 삭제되었습니다."
+                  error:
+                    type: null
+                    example: null
+        "403":
+          description: 권한 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 403
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "ForbiddenError"
+                      message:
+                        type: string
+                        example: "해당 작업을 수행할 권한이 없습니다."
+        "404":
+          description: 요청한 데이터를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "해당하는 선호원두 정보를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "서버 에러"
+  /users/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: 사용자 정보를 조회하기 위한 API
+      description: 특정 사용자의 상세 정보를 조회합니다.
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 조회하고자 하는 유저 아이디
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: 사용자 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        example: 1
+                      nickname:
+                        type: string
+                        example: "test11113"
+                      email:
+                        type: string
+                        format: email
+                        example: "example@example.com"
+                      profileImageUrl:
+                        type: string
+                        format: uri
+                        example: "https://example.com/profile.jpg"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2025-01-25T21:23:19.000Z"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2025-02-01T11:00:23.096Z"
+                  error:
+                    type: null
+                    example: null
+        "404":
+          description: 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "유저 아이디를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "사용자 정보 조회를 실패했습니다"
+  /nickname/check/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: 닉네임 중복 체크
+      description: 사용자가 입력한 닉네임이 중복되는지 확인하는 API
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 닉네임 중복 체크할 사용자 ID
+          schema:
+            type: string
+            example: "12345"
+      responses:
+        "200":
+          description: 닉네임 사용 가능 여부 응답
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isNotOverlap:
+                    type: boolean
+                    example: true
+        "400":
+          description: 잘못된 요청 (유효하지 않은 닉네임)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "닉네임이 유효하지 않습니다."
+        "500":
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "서버 에러 발생"
+  /users/nickname:
+    post:
+      tags:
+        - Users
+      summary: 닉네임을 생성하는 API
+      description: 특정 사용자의 닉네임을 생성합니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - nickname
+              properties:
+                userId:
+                  type: integer
+                  description: 유저 아이디
+                  example: 1
+                nickname:
+                  type: string
+                  description: 생성할 닉네임
+                  example: "test1111333"
+            examples:
+              validRequest:
+                summary: 유효한 요청 예시
+                value:
+                  userId: 1
+                  nickname: "test1111333"
+      responses:
+        "201":
+          description: 닉네임 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 201
+                  success:
+                    type: object
+                    properties:
+                      nickname:
+                        type: string
+                        example: "test1111333"
+                  error:
+                    type: null
+                    example: null
+        "400":
+          description: 유효성 검사 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 400
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "ValidationError"
+                      message:
+                        type: string
+                        example: "유저 아이디와 닉네임을 모두 제공받지 않음"
+        "404":
+          description: 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "유저아이디를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "닉네임 생성을 실패했습니다."
+    patch:
+      tags:
+        - Users
+      summary: 자기자신의 닉네임을 변경하는 API
+      description: 사용자의 닉네임을 새로운 닉네임으로 변경합니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - nickname
+              properties:
+                userId:
+                  type: integer
+                  description: 유저 아이디
+                  example: 1
+                nickname:
+                  type: string
+                  description: 변경할 새 닉네임
+                  example: "test1111333"
+            example:
+              userId: 1
+              nickname: "test1111333"
+      responses:
+        "200":
+          description: 닉네임 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Success"
+                  status:
+                    type: integer
+                    example: 200
+                  success:
+                    type: object
+                    properties:
+                      nickname:
+                        type: string
+                        example: "test1111333"
+                  error:
+                    type: null
+                    example: null
+        "400":
+          description: 유효성 검사 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 400
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "ValidationError"
+                      message:
+                        type: string
+                        example: "유저 아이디와 새 닉네임을 모두 제공받지 않음"
+        "404":
+          description: 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 404
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "NotFoundError"
+                      message:
+                        type: string
+                        example: "유저아이디를 찾을 수 없습니다."
+        "500":
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    example: "Fail"
+                  status:
+                    type: integer
+                    example: 500
+                  success:
+                    type: null
+                    example: null
+                  error:
+                    type: object
+                    properties:
+                      errorCode:
+                        type: string
+                        example: "InternalServerError"
+                      message:
+                        type: string
+                        example: "닉네임 변경을 실패했습니다."
+  /oauth2/login/naver:
+    get:
+      summary: "네이버 로그인"
+      description: |
+        **1단계:** 링크 접속 -> 
+        **2단계:** 액세스 토큰 복사 -> 
+        **3단계:** 오른쪽 맨 위에 붙여넣기
+        http://13.124.11.195:3000/callback/naver
+      responses:
+        "200":
+          description: "네이버 로그인 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "사용자 아이디"
+                    example: 1
+                  accessToken:
+                    type: string
+                    description: "네이버에서 발급된 액세스 토큰"
+                    example: "your-access-token"
+                  refreshToken:
+                    type: string
+                    description: "리프레시 토큰"
+                    example: "your-refresh-token"
+
+  /oauth2/login/kakao:
+    get:
+      summary: "카카오 로그인"
+      description: |
+        **1단계:** 링크 접속 -> 
+        **2단계:** 액세스 토큰 복사 -> 
+        **3단계:** 오른쪽 맨 위에 붙여넣기
+        http://13.124.11.195:3000/callback/kakao
+      responses:
+        "200":
+          description: "카카오 로그인 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "사용자 아이디"
+                    example: 2
+                  accessToken:
+                    type: string
+                    description: "카카오에서 발급된 액세스 토큰"
+                    example: "your-access-token"
+                  refreshToken:
+                    type: string
+                    description: "리프레시 토큰"
+                    example: "your-refresh-token"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
