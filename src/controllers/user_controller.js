@@ -6,7 +6,7 @@ import { NotFoundError, ValidationError } from "../error/error.js";
 //검사결과를 응답하기 위한 함수
 export const checkNicknameOverlap = async (req, res) => {
 	try {
-		const { nickname } = req.params;
+		const nickname = req.body.nickname;
 		const validNickname = user_dto.checkNicknameDto(nickname);
 		const isNotOverlap = await user_service.checkNicknameOverlap(validNickname); //true(중복아님) or false(중복임)를 리턴
 		return res.success({ isNotOverlap });
@@ -22,13 +22,15 @@ export const checkNicknameOverlap = async (req, res) => {
 //생성 성공일 때 그 닉네임으로 응답해주기 위한 함수
 export const createNickname = async (req, res) => {
 	try {
-		const { userId, nickname } = req.body;
+		const nickname = req.body.nickname;
+		const userId = req.user_id;
 		const { userId: validUserId, nickname: validNickname } =
 			user_dto.createNicknameDto(userId, nickname);
 		const newNickname = await user_service.createNickname(
 			validUserId,
 			validNickname
 		);
+
 		return res.success({ nickname: newNickname }, 201); // 상태 코드 201을 사용하여 생성 성공 응답
 	} catch (error) {
 		if (error instanceof NotFoundError) {
@@ -44,7 +46,8 @@ export const createNickname = async (req, res) => {
 //변경 성공일 때 그 닉네임으로 응답해주기 위한 함수
 export const changeNickname = async (req, res) => {
 	try {
-		const { userId, newNickname } = req.body;
+		const userId = req.user_id;
+		const newNickname = req.body.nickname;
 		const { userId: validUserId, newNickname: validNewNickname } =
 			user_dto.changeNicknameDto(userId, newNickname);
 		const updatedNickname = await user_service.changeNickname(
@@ -66,7 +69,7 @@ export const changeNickname = async (req, res) => {
 //조회 성공일 때, 그 정보로 응답해주기 위한 함수
 export const getUserInfo = async (req, res) => {
 	try {
-		const { user_id } = req.params;
+		const user_id = req.user_id;
 		const user = await user_service.getUserInfo(user_id);
 		return res.success(user);
 	} catch (error) {
