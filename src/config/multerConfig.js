@@ -1,7 +1,7 @@
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import path from 'path';
-import s3 from './s3client'; // S3 클라이언트 불러오기
+import s3 from './s3client.js';
 
 const upload = multer({
     storage: multerS3({
@@ -17,4 +17,4 @@ const upload = multer({
     }),
 });
 
-module.exports = upload;
+export default upload;
