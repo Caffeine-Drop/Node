@@ -10,6 +10,8 @@ class SearchService {
     // 카페 검색
     async searchCafes(userId, keyword, lat, lng, radius) {         
         try {
+            console.log(userId, keyword, lat, lng, radius);
+
             const user = await prisma.user.findFirst({ where: { user_id: userId } });
             if (!user) {
                 throw new NotFoundError({ message: '유저가 존재하지 않습니다.' });
@@ -59,10 +61,10 @@ class SearchService {
             throw new NotFoundError({ message: '유저가 존재하지 않습니다.' });
         }
 
-        const existingSearch = await this.searchRepository.findRecentSearchByTerm(userId, term);
+        const existingSearch = await prisma.recentSearch.findFirst({ where: { user_id : userId, search_term : term }})
         if (!existingSearch) {
             throw new NotFoundError({ message: `"${term}" 검색어가 존재하지 않습니다.` });
-        }        
+        }
 
         try {
           await this.searchRepository.deleteRecentSearchByTerm(userId, term);
