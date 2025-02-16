@@ -1,11 +1,11 @@
 import { makePreferredBean, findPreferredBean, deleteUserPreference } from '../services/preference_service.js';
-import { responseToPreffedBean, preferredBeanDto } from '../dtos/bean_dto.js';
+import { responseToPreffedBean } from '../dtos/bean_dto.js';
 import * as Error from '../error/error.js';
 
 // 선호원두 추가 컨트롤러
 export const handlePreferredBean = async(req, res, next) => {
   try {
-    const preferredBean = await makePreferredBean(responseToPreffedBean({ params: req.params, body: req.body }));
+    const preferredBean = await makePreferredBean(responseToPreffedBean({ params: req.user_id, body: req.body }));
     res.status(200).success(preferredBean);
   } catch (err) {
     if(err instanceof Error.NotFoundError){
@@ -21,7 +21,7 @@ export const handlePreferredBean = async(req, res, next) => {
 // 선호원두 조회 컨트롤러
 export const getPreferredBeanDetail = async(req, res, next) => {
   try {
-    const preferredBean = await findPreferredBean(Number(req.params.user_id));
+    const preferredBean = await findPreferredBean(String(req.user_id));
     res.status(200).success(preferredBean);
   } catch (err) {
     if(err instanceof Error.NotFoundError){
@@ -37,7 +37,7 @@ export const getPreferredBeanDetail = async(req, res, next) => {
 // 선호원두 삭제 컨트롤러
 export const removePreferredBean = async(req, res, next) => {
   try {
-    const preferredBean = await deleteUserPreference(preferredBeanDto(req.params));
+    const preferredBean = await deleteUserPreference({user_id: req.user_id,prefered_id: Number(req.params.prefered_id)});
     console.log(preferredBean);
     res.status(200).success(preferredBean);
   } catch (err) {

@@ -1907,20 +1907,63 @@ paths:
                       message:
                         type: string
                         example: "닉네임 변경을 실패했습니다."
-  /oauth2/login/kakao:
-    get:
-      summary: "카카오 로그인"
-      description: |
-        **1단계:** 링크 접속 http://13.124.11.195:3000/oauth2/login/naver -> 
-        **2단계:** 액세스 토큰 복사 http://13.124.11.195:3000/oauth2/callback/naver -> 
-        **3단계:** 오른쪽 맨 위에 붙여넣기
   /oauth2/login/naver:
     get:
       summary: "네이버 로그인"
       description: |
-        **1단계:** 링크 접속 http://13.124.11.195:3000/oauth2/login/kakao -> 
-        **2단계:** 액세스 토큰 복사 http://13.124.11.195:3000/oauth2/callback/kakao -> 
+        **1단계:** 링크 접속 -> 
+        **2단계:** 액세스 토큰 복사 -> 
         **3단계:** 오른쪽 맨 위에 붙여넣기
+        http://13.124.11.195:3000/callback/naver
+      responses:
+        "200":
+          description: "네이버 로그인 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "사용자 아이디"
+                    example: 1
+                  accessToken:
+                    type: string
+                    description: "네이버에서 발급된 액세스 토큰"
+                    example: "your-access-token"
+                  refreshToken:
+                    type: string
+                    description: "리프레시 토큰"
+                    example: "your-refresh-token"
+
+  /oauth2/login/kakao:
+    get:
+      summary: "카카오 로그인"
+      description: |
+        **1단계:** 링크 접속 -> 
+        **2단계:** 액세스 토큰 복사 -> 
+        **3단계:** 오른쪽 맨 위에 붙여넣기
+        http://13.124.11.195:3000/callback/kakao
+      responses:
+        "200":
+          description: "카카오 로그인 성공"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "사용자 아이디"
+                    example: 2
+                  accessToken:
+                    type: string
+                    description: "카카오에서 발급된 액세스 토큰"
+                    example: "your-access-token"
+                  refreshToken:
+                    type: string
+                    description: "리프레시 토큰"
+                    example: "your-refresh-token"
 components:
   securitySchemes:
     bearerAuth:
