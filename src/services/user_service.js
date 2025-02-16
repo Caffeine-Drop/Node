@@ -20,10 +20,10 @@ export const checkNicknameOverlap = async (nickname) => {
 //그 닉네임을 반환(service -> controller)하기 위한 함수
 export const createNickname = async (userId, nickname) => {
   try {
-    const existingUser = await user_repository.findByUserId(userId);
+    const existingUser = await user_repository.findByUserId(String(userId));
     if (existingUser == null) 
       throw new NotFoundError('유저아이디를 찾을 수 없습니다.');
-    await user_repository.createNickname(userId, nickname);
+    const result = await user_repository.createNickname(String(userId), nickname);
     return nickname;
   } catch (error) {
     if (error instanceof NotFoundError)
@@ -38,9 +38,9 @@ export const createNickname = async (userId, nickname) => {
 //그 닉네임을 반환(service -> controller)하기 위한 함수
 export const changeNickname = async (userId, newNickname) => {
   try {
-    const existingUser = await user_repository.findByUserId(userId);
+    const existingUser = await user_repository.findByUserId(String(userId));
     if (existingUser == null) throw new NotFoundError('유저 아이디를 찾을 수 없습니다.');
-    await user_repository.changeNickname(userId, newNickname);
+    await user_repository.changeNickname(String(userId), newNickname);
     return newNickname;
   } catch (error) {
     if (error instanceof NotFoundError)
@@ -54,7 +54,7 @@ export const changeNickname = async (userId, newNickname) => {
 //DTO를 거처 유저 정보를 반환(service -> controller)하기 위한 함수
 export const getUserInfo = async (userId) => {
   try {
-    const user = await user_repository.findByUserId(userId);
+    const user = await user_repository.findByUserId(String(userId));
     if (user == null) throw new NotFoundError('유저 아이디를 찾을 수 없습니다.');
     return getUserInfoDto(user);
   } catch (error) {
@@ -70,6 +70,6 @@ export const updateProfileImage = async (userId, imageUrl) => {
     throw new Error('유효하지 않은 사용자입니다.');
   }
   
-  const updatedUser = await user_repository.updateUserProfileImage(userId, imageUrl);
+  const updatedUser = await user_repository.updateUserProfileImage(String(userId), imageUrl);
   return updatedUser;
 };
