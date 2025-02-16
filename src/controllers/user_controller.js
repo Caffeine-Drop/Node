@@ -2,11 +2,9 @@ import * as user_service from "../services/user_service.js";
 import * as user_dto from "../dtos/user_dto.js";
 import { NotFoundError, ValidationError } from "../error/error.js";
 
-import { s3 } from '../config/s3Client.js';
+import s3 from '../config/s3Client.js';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
