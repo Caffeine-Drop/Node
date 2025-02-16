@@ -13,8 +13,8 @@ class SearchController {
         const lng = Number(req.query.lng);
         const radius = Number(req.query.radius);
         
-        if (!user_id || isNaN(user_id)) {
-            return res.status(400).json({ message: '유저 아이디는 필수이며 숫자여야 합니다.' });
+        if (!user_id) {
+            return res.status(400).json({ message: '유저 아이디는 필수입니다.' });
         }
 
         if (!keyword || keyword.trim().length === 0) {
@@ -78,8 +78,8 @@ class SearchController {
     async getRecentTerms(req, res, next) {
         const user_id = String(req.user_id);
 
-        if (!user_id || isNaN(user_id)) {
-            return res.status(400).json({ message: '유저아이디는 필수이며 숫자여야 합니다.' });
+        if (!user_id) {
+            return res.status(400).json({ message: '유저 아이디는 필수입니다.' });
         }
 
         try {
@@ -105,8 +105,8 @@ class SearchController {
         const user_id = String(req.user_id);
         const { keyword } = req.query;
 
-        if (!user_id || isNaN(user_id)) {
-            return res.status(400).json({ message: '유저아이디는 필수이며 숫자여야 합니다.' });
+        if (!user_id) {
+            return res.status(400).json({ message: '유저 아이디는 필수입니다.' });
         }
 
         if (!keyword || keyword.trim().length === 0) {
@@ -135,8 +135,8 @@ class SearchController {
     async deleteAllSearchTerms(req, res, next) {
         const user_id = String(req.user_id);
 
-        if (!user_id || isNaN(user_id)) {
-            return res.status(400).json({ message: '유저아이디는 필수이며 숫자여야 합니다.' });
+        if (!user_id) {
+            return res.status(400).json({ message: '유저 아이디는 필수입니다.' });
         }
     
         try {
