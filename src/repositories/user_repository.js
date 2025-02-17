@@ -67,6 +67,31 @@ export const updateUserProfileImage = async (userId, imageUrl) => {
   }
 };
 
+//유저 정보를 받고 유저를 생성하기 위한 함수
+export async function createUser(userData) {
+  const {
+    user_id,
+    email,
+    email_type,
+    nickname,
+    profile_image_url
+  } = userData;  //분할할당(destructuring)
+
+  const createdUser = await prisma.user.create({
+    data: {
+      user_id,
+      email,
+      email_type,
+      nickname,
+      profile_image_url,
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+  })
+
+  return createdUser;
+}
+
 // 유저 정보를 조회하는 함수
 export const getUser = async (userId) => {
   const user = await prisma.user.findUnique( { where: { user_id: userId} } );
@@ -76,4 +101,3 @@ export const getUser = async (userId) => {
   
   return user;
 }
-
