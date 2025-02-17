@@ -1,5 +1,4 @@
 import express from "express";
-import { upload } from '../config/multerConfig.js';
 import * as userController from "../controllers/user_controller.js";
 import { authenticateToken } from './authMiddleware.js';
 
@@ -18,16 +17,7 @@ router.patch("/nickname", authenticateToken, userController.changeNickname);
 router.get("", authenticateToken, userController.getUserInfo);
 
 // 프로필 이미지 등록 및 변경 API
-router.post(
-    "/profile-image", 
-    (req, res, next) => {
-      req.dir = 'profile-images';  // req.dir 설정 미들웨어 (S3에 저장할 폴더 지정)
-    next();
-    },
-    upload.single('profile-image'), 
-    authenticateToken,
-    userController.uploadProfileImage
-  );
+router.post("/profile-image", authenticateToken, userController.uploadProfileImage);
 
 export default router;
 

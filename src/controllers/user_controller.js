@@ -2,6 +2,12 @@ import * as user_service from "../services/user_service.js";
 import * as user_dto from "../dtos/user_dto.js";
 import { NotFoundError, ValidationError } from "../error/error.js";
 
+import s3 from '../config/s3client.js';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import axios from 'axios';
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
 //사용 가능한 닉네임인지 확인 요청을 받았을 때, 검사할 수 있도록 service계층에 DTO를 통해 데이터를 보내고,
 //검사결과를 응답하기 위한 함수
 export const checkNicknameOverlap = async (req, res) => {
@@ -80,24 +86,49 @@ export const getUserInfo = async (req, res) => {
 	}
 };
 
-//업로드된 파일 정보를 추출하고 인증 정보와 URL를 service에 전달하기 위한 함수
-export const uploadProfileImage = async (req, res, next) => {
+// URL로 프로필 사진 변경 API
+export const uploadProfileImage = async (req, res) => {
 	try {
-
-	  // 파일이 업로드되지 않았을 경우 에러 처리
-	  if (!req.file || !req.file.location) {
-		return res.error(new ValidationError('파일 업로드에 실패했습니다.'), 400);
-	  }
-	  
-	  const imageUrl = req.file.location;  // S3에 저장된 이미지 URL
-	  const userId = req.user_id;   //세션에서 userId를 가져옴
-	  const updatedUser = await user_service.updateProfileImage(userId, imageUrl); // Service 계층에 프로필 이미지 업데이트 요청
+	  const { imageUrl } = req.body;
+	  const userId = String(req.user_id);
   
-	  return res.success({ user: updatedUser });
+	  if (!imageUrl) {
+		return res.status(400).json({ error: "이미지 URL이 필요합니다." });
+	  }
+  
+	  // 1. 클라이언트로부터 받은 이미지 URL을 통해 이미지를 다운로드
+	  const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+
+	  // 2. S3 업로드를 위한 준비 (파일 이름은 임의로 생성)
+	  const fileName = `profile-images/${userId}-${Date.now()}.jpg`; // 파일 이름 생성
+	  const fileBuffer = Buffer.from(response.data);
+  
+	  const uploadParams = {
+		Bucket: 'caffeinedrop',
+		Key: fileName,
+		Body: fileBuffer,
+		ContentType: response.headers["content-type"],
+	  };
+  
+	  // 3. S3에 파일 업로드
+	  await s3.send(new PutObjectCommand(uploadParams));
+  
+	  // 4. 업로드된 S3 이미지 URL 생성
+	  const s3Url = `https://${uploadParams.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+  
+	  // 5. DB에 저장
+	  const updatedUser = await prisma.user.update({
+		where: { user_id: userId },
+		data: { profile_image_url: s3Url },
+	  });
+  
+	  res.json({
+		message: "프로필 사진 변경 성공",
+		imageUrl: s3Url,
+	  });
+  
 	} catch (error) {
-		if (error instanceof ValidationError) {
-			return res.error(error, 400);
-		}
-		return res.error(error, 500);
+	  console.error("프로필 사진 변경 실패:", error);
+	  res.status(500).json({ error: "프로필 사진 변경 실패" });
 	}
-  };
+};
