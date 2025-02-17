@@ -21,7 +21,7 @@ const uploadImagesToS3 = async (files) => {
         const uploadPromises = files.map((file) => {
             const params = {
                 Bucket: BUCKET_NAME,
-                Key: `${uuidv4()}-${file.originalname}`,
+                Key: `review/${uuidv4()}-${file.originalname}`,
                 Body: file.buffer,
                 ContentType: file.mimetype,
             };
