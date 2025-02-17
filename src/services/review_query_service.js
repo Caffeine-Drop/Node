@@ -8,7 +8,36 @@ import {
   NotFoundError,
   InternalServerError,
 } from "../error/error.js";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+// S3 설정
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+
+// S3 Presigned URL 생성 함수
+const getPresignedUrl = async (key) => {
+  if (!key) return null;
+  try {
+    const command = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+    return await getSignedUrl(s3, command, { expiresIn: 3600 }); // Presigned URL 1시간 유효
+  } catch (error) {
+    console.error("Presigned URL 생성 실패:", error);
+    return null;
+  }
+};
+
+// 유효성 검사 함수
 const validateString = (value, fieldName) => {
   if (typeof value !== "string" || value.trim() === "") {
     throw new ValidationError(`${fieldName}는 유효한 문자열이어야 합니다.`);
@@ -16,7 +45,8 @@ const validateString = (value, fieldName) => {
   return value.trim();
 };
 
-export const getReviews = async (cafeId, userId, offset = 0, limit = 10) => {
+// 리뷰 조회 서비스
+export const getReviews = async (cafeId, userId = null, offset = 0, limit = 10) => {
   try {
     // 유효성 검사
     const parsedCafeId = Number(cafeId);
@@ -46,6 +76,13 @@ export const getReviews = async (cafeId, userId, offset = 0, limit = 10) => {
       throw new NotFoundError("해당 카페에 리뷰가 존재하지 않습니다.");
     }
 
+    // S3 Presigned URL 변환
+    for (const review of reviews) {
+      for (const image of review.images) {
+        image.image_url = await getPresignedUrl(image.image_url);
+      }
+    }
+
     const overallRating = overallRatingResult._avg.rating
     ? parseFloat(overallRatingResult._avg.rating.toFixed(1)) // 평균 별점만 반올림
     : null;
@@ -71,6 +108,7 @@ export const getReviews = async (cafeId, userId, offset = 0, limit = 10) => {
   }
 };
 
+// 특정 카페의 평점 데이터 조회 서비스
 export const getRatings = async (cafeId) => {
   return await fetchCafeOverallRating(cafeId);
 }
