@@ -4,7 +4,6 @@ import { NotFoundError, ValidationError } from "../error/error.js";
 
 import s3 from '../config/s3client.js';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
-import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -118,7 +117,7 @@ export const uploadProfileImage = async (req, res) => {
 	  const s3Url = `https://${uploadParams.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
   
 	  // 5. DB에 저장
-	  const updatedUser = await prisma.user.update({
+	  await prisma.user.update({
 		where: { user_id: userId },
 		data: { profile_image_url: s3Url },
 	  });
