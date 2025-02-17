@@ -89,28 +89,29 @@ export const getUserInfo = async (req, res) => {
 // URL로 프로필 사진 변경 API
 export const uploadProfileImage = async (req, res) => {
 	try {
-	  const { imageUrl } = req.body;
 	  const userId = String(req.user_id);
   
-	  if (!imageUrl) {
-		return res.status(400).json({ error: "이미지 URL이 필요합니다." });
+	  // 1. 파일이 있는지 확인
+	  if (!req.file) {
+		return res.status(400).json({ error: "이미지 파일이 필요합니다." });
 	  }
   
-	  // 1. 클라이언트로부터 받은 이미지 URL을 통해 이미지를 다운로드
-	  const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-
-	  // 2. S3 업로드를 위한 준비 (파일 이름은 임의로 생성)
-	  const fileName = `profile-images/${userId}-${Date.now()}.jpg`; // 파일 이름 생성
-	  const fileBuffer = Buffer.from(response.data);
+	  const file = req.file; // 업로드된 파일
+	  const fileName = `profile-images/${userId}-${Date.now()}.jpg`;
   
+	  // 2. 파일이 JPEG인지 확인
+	  if (file.mimetype !== "image/jpeg") {
+		return res.status(400).json({ error: "JPEG 형식의 이미지만 지원됩니다." });
+	  }
+  
+	  // 3. S3 업로드
 	  const uploadParams = {
-		Bucket: 'caffeinedrop',
+		Bucket: "caffeinedrop",
 		Key: fileName,
-		Body: fileBuffer,
-		ContentType: response.headers["content-type"],
+		Body: file.buffer, // Multer가 메모리에 저장한 파일 버퍼
+		ContentType: "image/jpeg",
 	  };
   
-	  // 3. S3에 파일 업로드
 	  await s3.send(new PutObjectCommand(uploadParams));
   
 	  // 4. 업로드된 S3 이미지 URL 생성
