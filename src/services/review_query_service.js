@@ -1,7 +1,7 @@
 import {
   getReviews as fetchReviews, 
   getTotalReviews as fetchTotalReviews,
-  getCafeOverallRating as fetchCafeOverallRating,
+  getCafeRatings as fetchCafeOverallRating,
 } from "../repositories/review_query_repository.js";
 import {
   ValidationError,
@@ -70,3 +70,7 @@ export const getReviews = async (cafeId, userId, offset = 0, limit = 10) => {
     throw new InternalServerError("리뷰를 가져오는 중 서버 에러가 발생했습니다.");
   }
 };
+
+export const getRatings = async (cafeId) => {
+  return await fetchCafeOverallRating(cafeId);
+}

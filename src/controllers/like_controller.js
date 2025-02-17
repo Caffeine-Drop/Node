@@ -8,11 +8,12 @@ const service = new LikeService(likeRepository);
 class LikeController {
     // 카페 좋아요
     async favorCafe(req, res, next) {
-        const user_id = Number(req.user_id);
+        const user_id = String(req.user_id);
         const cafe_id = Number(req.params.cafe_id);
 
+        console.log(user_id, cafe_id);
 
-        if (!user_id || isNaN(user_id)) {
+        if (!user_id) {
             return res.status(400).json({ message: '유저 아이디는 필수이며 숫자여야 합니다.' });
         }
 
@@ -21,9 +22,9 @@ class LikeController {
         }
 
         try {
-            await service.likeForCafe(user_id, cafe_id);
+            const like = await service.likeForCafe(user_id, cafe_id);
             return res.status(200).json({
-                message: '좋아요 완료',
+                message: '좋아요 완료', like,
                 user_id : user_id,
                 cafe_id : cafe_id,
             });

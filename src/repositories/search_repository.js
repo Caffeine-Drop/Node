@@ -7,6 +7,7 @@ class SearchRepository {
   // 단어별 검색 수 증가
   // 단어가 없다면 생성 후 추가, 있다면 증가
   async incrementSearchCount(keyword) {
+    console.log("단어 수 증가", keyword);
     const existingTerm = await prisma.searchTerm.findFirst({
       where: { term: keyword },
     });
@@ -33,10 +34,12 @@ class SearchRepository {
 
   // 유저별 최근 검색어 저장
   async saveRecentSearch(user_id, keyword) {
+    console.log("최근 검색어", user_id, keyword);
+
     // 기존 검색어가 있는지 확인
     const existingSearch = await prisma.recentSearch.findFirst({
       where: {
-        user_id: parseInt(user_id),
+        user_id: user_id,
         search_term: keyword,
       },
     });
@@ -55,7 +58,7 @@ class SearchRepository {
     // 기존 검색어가 없다면 새로 추가
       await prisma.recentSearch.create({
           data: {
-              user_id: parseInt(user_id),
+              user_id: user_id,
               search_term: keyword,
               searched_at: new Date(),
           },
@@ -66,6 +69,8 @@ class SearchRepository {
 
   // 키워드 검색 - 한국어 최적화 및 검색 반경 설정
   async searchCafesByKeyword(keyword, lat, lng, radius) {
+    console.log("엘라스틱 서치", keyword, lat, lng, radius);
+
     const result = await elasticsearchClient.search({
       index: 'cafes',
       body: {
@@ -162,7 +167,7 @@ class SearchRepository {
   async deleteRecentSearchByTerm(userId, term) {
     await prisma.recentSearch.deleteMany({
       where: {
-        user_id: parseInt(userId),
+        user_id: userId,
         search_term: term,
       },
     });
@@ -173,7 +178,7 @@ class SearchRepository {
   async deleteAllRecentSearches(userId) {
     await prisma.recentSearch.deleteMany({
       where: {
-        user_id: parseInt(userId),
+        user_id: userId,
       },
     });
     console.log(`${userId} 모든 검색어 삭제 완료`);
