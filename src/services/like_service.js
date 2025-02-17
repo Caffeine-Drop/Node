@@ -20,7 +20,8 @@ class LikeService {
 		}
 
 		try {
-			await this.likeRepository.likeCafe(userId, cafeId);
+			const like = await this.likeRepository.likeCafe(userId, cafeId);
+			return like;
 		} catch (error) {
 			console.error("카페 좋아요 하는 중 오류 발생:", error);
 

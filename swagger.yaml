@@ -1095,6 +1095,8 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
+
+  /users/{user_id}/preferred-beans:
   /users/preferred-beans:
     get:
       tags:
@@ -1102,6 +1104,13 @@ paths:
       summary: 특정 사용자의 선호원두 정보를 조회하는 API
       description: 사용자의 모든 선호 원두 정보를 조회합니다.
       parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 조회하고자 하는 사용자 id
+          schema:
+            type: integer
+            example: 1
         - in: header
           name: Authorization
           description: 토큰에서 추출한 유저 아이디
@@ -1232,6 +1241,8 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
+
+  /users/{user_id}/preferred-bean:
   /users/preferred-bean:
     post:
       tags:
@@ -1239,6 +1250,13 @@ paths:
       summary: 특정 사용자의 선호원두 정보를 생성하는 API
       description: 사용자의 원두 선호도 정보(로스팅, 향, 산미, 바디감, 원산지)를 생성합니다.
       parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 추가하고자 하는 유저의 id값
+          schema:
+            type: integer
+            example: 1
         - in: header
           name: Authorization
           description: 토큰에서 추출한 유저 아이디
@@ -1380,6 +1398,7 @@ paths:
                       message:
                         type: string
                         example: "서버 에러"
+    /users/{user_id}/preferred-bean/{prefered_id}:
     /users/preferred-bean/{prefered_id}:
     delete:
       tags:
@@ -1387,6 +1406,13 @@ paths:
       summary: 특정 사용자의 선호원두 정보를 삭제하는 API
       description: 사용자의 특정 선호 원두 정보를 삭제합니다.
       parameters:
+        - in: path
+          name: user_id
+          required: true
+          description: 사용자 id
+          schema:
+            type: integer
+            example: 1
         - in: header
           name: Authorization
           description: 토큰에서 추출한 유저 아이디
@@ -1910,11 +1936,10 @@ paths:
   /oauth2/login/naver:
     get:
       summary: "네이버 로그인"
-      description: |
-        **1단계:** 링크 접속 -> 
-        **2단계:** 액세스 토큰 복사 -> 
-        **3단계:** 오른쪽 맨 위에 붙여넣기
-        http://13.124.11.195:3000/callback/naver
+      description:
+        "1단계: 링크 접속 http://13.124.11.195:3000/oauth2/login/naver
+        /n2단계: 액세스 토큰 복사 http://13.124.11.195:3000/oauth2/callback/naver
+        /n3단계: 오른쪽 맨 위에 붙여넣기"
       responses:
         "200":
           description: "네이버 로그인 성공"
@@ -1939,11 +1964,10 @@ paths:
   /oauth2/login/kakao:
     get:
       summary: "카카오 로그인"
-      description: |
-        **1단계:** 링크 접속 -> 
-        **2단계:** 액세스 토큰 복사 -> 
-        **3단계:** 오른쪽 맨 위에 붙여넣기
-        http://13.124.11.195:3000/callback/kakao
+      description:
+        "1단계: 링크 접속 http://13.124.11.195:3000/oauth2/login/kakao
+        /n2단계: 액세스 토큰 복사 http://13.124.11.195:3000/oauth2/callback/kakao
+        /n3단계: 오른쪽 맨 위에 붙여넣기"
       responses:
         "200":
           description: "카카오 로그인 성공"
