@@ -6,18 +6,23 @@ export class CafeRepository {
     const { dayOfWeek, time, likes, rating } = filters;
     const whereCondition = {};
 
-    if (dayOfWeek && time) {
-      // time을 Date 객체로 변환 후 9시간 추가 (UTC → KST) js기본이 utc기준이어서 변환 필수
-      const kstTime = new Date(time);
-      kstTime.setHours(kstTime.getHours() + 9);
-
+    if (dayOfWeek || time) {
       whereCondition.operating_hours = {
-        some: {
-          day_of_week: dayOfWeek.trim(),
-          open_time: { lte: kstTime },
-          close_time: { gte: kstTime },
-        },
+        some: {},
       };
+
+      if (dayOfWeek) {
+        whereCondition.operating_hours.some.day_of_week = dayOfWeek.trim();
+      }
+
+      if (time) {
+        // time을 Date 객체로 변환 후 9시간 추가 (UTC → KST)
+        const kstTime = new Date(time);
+        kstTime.setHours(kstTime.getHours() + 9);
+
+        whereCondition.operating_hours.some.open_time = { lte: kstTime };
+        whereCondition.operating_hours.some.close_time = { gte: kstTime };
+      }
     }
 
     // Prisma 쿼리로 리뷰와 평가 데이터를 함께 가져오기
@@ -26,7 +31,7 @@ export class CafeRepository {
       select: {
         cafe_id: true,
         name: true,
-        operating_hour: true,
+        operating_hours: true,
         _count: {
           select: {
             likes: true,
