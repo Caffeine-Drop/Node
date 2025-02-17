@@ -1,5 +1,21 @@
 import { InternalServerError, NotFoundError, ValidationError } from '../error/error.js';
-import { logoutServiceKakao, logoutServiceNaver } from '../services/auth_service.js';
+import { kakaoLoginService, logoutServiceKakao, logoutServiceNaver } from '../services/auth_service.js';
+
+//카카오 로그인에서, 받은 코드와 토큰을 교환하고 DB에 업데이트 하기 위한 함수
+export async function kakaoLoginController(req, res) {
+  try {
+    const { code } = req.body;
+    if (!code) {
+      return res.error(new ValidationError('카카오 인가 코드가 없습니다.'), 400);
+    }
+
+    const userData = await kakaoLoginService(code);
+
+    return res.success(userData);
+  } catch (error) {
+    res.error(error);
+  }
+}
 
 //네이버인지 카카오인지 분리하고 각각에 맞는 로그아웃 절차를 매칭해주기 위한 함수
 //로그아웃 절차가 끝나면 세션을 종료시킨다.
