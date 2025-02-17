@@ -2,9 +2,9 @@ import * as user_service from "../services/user_service.js";
 import * as user_dto from "../dtos/user_dto.js";
 import { NotFoundError, ValidationError } from "../error/error.js";
 
-import s3 from '../config/s3client.js';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { PrismaClient } from '@prisma/client';
+import s3 from "../config/s3client.js";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 //사용 가능한 닉네임인지 확인 요청을 받았을 때, 검사할 수 있도록 service계층에 DTO를 통해 데이터를 보내고,
@@ -88,47 +88,48 @@ export const getUserInfo = async (req, res) => {
 // URL로 프로필 사진 변경 API
 export const uploadProfileImage = async (req, res) => {
 	try {
-	  const userId = String(req.user_id);
-  
-	  // 1. 파일이 있는지 확인
-	  if (!req.file) {
-		return res.status(400).json({ error: "이미지 파일이 필요합니다." });
-	  }
-  
-	  const file = req.file; // 업로드된 파일
-	  const fileName = `profile-images/${userId}-${Date.now()}.jpg`;
-  
-	  // 2. 파일이 JPEG인지 확인
-	  if (file.mimetype !== "image/jpeg") {
-		return res.status(400).json({ error: "JPEG 형식의 이미지만 지원됩니다." });
-	  }
-  
-	  // 3. S3 업로드
-	  const uploadParams = {
-		Bucket: "caffeinedrop",
-		Key: fileName,
-		Body: file.buffer, // Multer가 메모리에 저장한 파일 버퍼
-		ContentType: "image/jpeg",
-	  };
-  
-	  await s3.send(new PutObjectCommand(uploadParams));
-  
-	  // 4. 업로드된 S3 이미지 URL 생성
-	  const s3Url = `https://${uploadParams.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-  
-	  // 5. DB에 저장
-	  await prisma.user.update({
-		where: { user_id: userId },
-		data: { profile_image_url: s3Url },
-	  });
-  
-	  res.json({
-		message: "프로필 사진 변경 성공",
-		imageUrl: s3Url,
-	  });
-  
+		const userId = String(req.user_id);
+
+		// 1. 파일이 있는지 확인
+		if (!req.file) {
+			return res.status(400).json({ error: "이미지 파일이 필요합니다." });
+		}
+
+		const file = req.file; // 업로드된 파일
+		const fileName = `profile-images/${userId}-${Date.now()}.jpg`;
+
+		// 2. 파일이 JPEG인지 확인
+		if (file.mimetype !== "image/jpeg") {
+			return res
+				.status(400)
+				.json({ error: "JPEG 형식의 이미지만 지원됩니다." });
+		}
+
+		// 3. S3 업로드
+		const uploadParams = {
+			Bucket: "caffeinedrop",
+			Key: fileName,
+			Body: file.buffer, // Multer가 메모리에 저장한 파일 버퍼
+			ContentType: "image/jpeg",
+		};
+
+		await s3.send(new PutObjectCommand(uploadParams));
+
+		// 4. 업로드된 S3 이미지 URL 생성
+		const s3Url = `https://${uploadParams.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+		// 5. DB에 저장
+		await prisma.user.update({
+			where: { user_id: userId },
+			data: { profile_image_url: s3Url },
+		});
+
+		res.json({
+			message: "프로필 사진 변경 성공",
+			imageUrl: s3Url,
+		});
 	} catch (error) {
-	  console.error("프로필 사진 변경 실패:", error);
-	  res.status(500).json({ error: "프로필 사진 변경 실패" });
+		console.error("프로필 사진 변경 실패:", error);
+		res.status(500).json({ error: "프로필 사진 변경 실패" });
 	}
 };

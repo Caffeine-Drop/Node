@@ -132,10 +132,9 @@ class SearchController {
 		}
 
 		try {
-			const result = await service.deleteRecentSearch(user_id, keyword);
+			await service.deleteRecentSearch(user_id, keyword);
 			return res.status(200).json({
 				message: "유저별 최근 검색어 삭제 완료 (1개)",
-				deleteTerm: result,
 			});
 		} catch (error) {
 			if (error instanceof NotFoundError) {
