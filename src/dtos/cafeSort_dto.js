@@ -8,9 +8,8 @@ export class cafeSortDto {
     this.like_count = cafe._count ? cafe._count.likes : 0;
     this.review_count = cafe._count ? cafe._count.reviews : 0;
     this.avgRating = cafe.avgRating ? cafe.avgRating.toFixed(2) : '0.00';
-
+    this.distance = cafe.distance;
     // this.avgRating = cafe.avgRating.toFixed(2);
-    console.log('dtotest', this);
   }
 
   static fromArray(cafes) {
