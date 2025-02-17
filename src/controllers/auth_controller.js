@@ -2,14 +2,14 @@ import { InternalServerError, NotFoundError, ValidationError } from '../error/er
 import { kakaoLoginService, logoutServiceKakao, logoutServiceNaver } from '../services/auth_service.js';
 
 //카카오 로그인에서, 받은 코드와 토큰을 교환하고 DB에 업데이트 하기 위한 함수
-export async function kakaoLoginController(req, res) {
+export async function kakaoLoginController(req, res, next) {
   try {
-    const { code } = req.body;
-    if (!code) {
-      return res.error(new ValidationError('카카오 인가 코드가 없습니다.'), 400);
+    const { code, redirect_uri } = req.body;
+    if (!code || !redirect_uri) {
+      return res.error(new ValidationError('카카오 인가 코드 또는 리다이렉트 uri가 없습니다.'), 400);
     }
 
-    const userData = await kakaoLoginService(code);
+    const userData = await kakaoLoginService(code, redirect_uri);
 
     return res.success(userData);
   } catch (error) {
