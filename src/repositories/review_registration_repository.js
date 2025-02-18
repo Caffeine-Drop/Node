@@ -1,4 +1,5 @@
-import prisma from "../prisma.js";
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 import { InternalServerError } from "../error/error.js";
 
 // 리뷰 등록 (트랜잭션 적용)

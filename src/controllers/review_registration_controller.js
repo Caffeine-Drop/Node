@@ -1,5 +1,5 @@
 import { uploadReviewImages } from "../middlewares/multerMiddleware.js";
-import { registerReview } from "../services/review_registration_service.js";
+import { registerReview } from "../services/reivew_registration_service.js";
 import {
     ValidationError,
     NotFoundError,
@@ -8,16 +8,13 @@ import {
     InternalServerError,
 } from "../error/error.js";
 
-// multer 미들웨어를 프로미스화
-const uploadReviewImagesAsync = promisify(uploadReviewImages);
-
 export const createReviewController = async (req, res) => {
     try {
         // Multer 미들웨어 실행 (파일 업로드)
-        await uploadReviewImagesAsync(req, res);
+        await uploadReviewImages(req, res);
 
         const { cafeId } = req.params;
-        const userId = req.body.userId;
+        const userId = String(req.body.userId);
         const content = req.body.content || null;
         const evaluations = req.body.evaluations ? JSON.parse(req.body.evaluations) : [];
 
