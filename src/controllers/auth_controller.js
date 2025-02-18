@@ -1,5 +1,5 @@
 import { InternalServerError, NotFoundError, ValidationError } from '../error/error.js';
-import { kakaoLoginService, logoutServiceKakao, logoutServiceNaver } from '../services/auth_service.js';
+import { naverLoginService, kakaoLoginService, logoutServiceKakao, logoutServiceNaver } from '../services/auth_service.js';
 
 //카카오 로그인에서, 받은 코드와 토큰을 교환하고 DB에 업데이트 하기 위한 함수
 export async function kakaoLoginController(req, res, next) {
@@ -14,6 +14,26 @@ export async function kakaoLoginController(req, res, next) {
     return res.success(userData);
   } catch (error) {
     res.error(error);
+  }
+}
+
+//네이버 로그인에서, 받은 코드와 토큰을 교환하고 DB에 업데이트 하기 위한 함수
+export async function naverLoginController(req, res) {
+  try {
+    // 네이버는 state 파라미터를 함께 사용하는 경우가 많음
+    const { code, state, redirect_uri } = req.body;
+    if (!code || !state || !redirect_uri) {
+      return res.error(
+        new ValidationError("네이버 인가 코드 또는 state 또는 redirect_uri가 없습니다."),
+        400
+      );
+    }
+
+    // Service에서 토큰 교환 + DB 저장 후 유저 정보 반환
+    const userData = await naverLoginService({code, state, redirect_uri});
+    return res.success(userData);
+  } catch (error) {
+    return res.error(error);
   }
 }
 
