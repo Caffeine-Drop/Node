@@ -1,17 +1,16 @@
 import * as user_service from "../services/user_service.js";
 import * as user_dto from "../dtos/user_dto.js";
 import { NotFoundError, ValidationError } from "../error/error.js";
-
-import s3 from "../config/s3client.js";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { PrismaClient } from "@prisma/client";
+import s3 from '../config/s3client.js';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 //사용 가능한 닉네임인지 확인 요청을 받았을 때, 검사할 수 있도록 service계층에 DTO를 통해 데이터를 보내고,
 //검사결과를 응답하기 위한 함수
 export const checkNicknameOverlap = async (req, res) => {
 	try {
-		const nickname = req.body.nickname;
+		const nickname = req.params;
 		const validNickname = user_dto.checkNicknameDto(nickname);
 		const isNotOverlap = await user_service.checkNicknameOverlap(validNickname); //true(중복아님) or false(중복임)를 리턴
 		return res.success({ isNotOverlap });

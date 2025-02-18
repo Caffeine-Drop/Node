@@ -16,9 +16,7 @@ export class CafeRepository {
       }
 
       if (time) {
-        // time을 Date 객체로 변환 후 9시간 추가 (UTC → KST)
         const kstTime = new Date(time);
-        kstTime.setHours(kstTime.getHours() + 9);
 
         whereCondition.operating_hours.some.open_time = { lte: kstTime };
         whereCondition.operating_hours.some.close_time = { gte: kstTime };
