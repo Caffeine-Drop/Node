@@ -6,6 +6,8 @@ const router = express.Router();
 
 // 카페 전체 평점 반환
 router.get("/reviews/:cafe_id/ratings", getRating);
+// 리뷰 등록 엔드포인트
+router.post("/reviews/:cafeId", createReviewController);
 
 // 카페 리뷰 등록 평점
 router.post("/reviews/:cafe_id", createReviewController)

@@ -8,24 +8,63 @@ import {
   NotFoundError,
   InternalServerError,
 } from "../error/error.js";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const validateNumber = (value, fieldName) => {
-  const parsedValue = Number(value);
-  if (isNaN(parsedValue)) {
-    throw new ValidationError(`${fieldName}는 숫자여야 합니다.`);
+// S3 설정
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+
+// S3 Presigned URL 생성 함수
+const getPresignedUrl = async (key) => {
+  if (!key) return null;
+  try {
+    const command = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+    return await getSignedUrl(s3, command, { expiresIn: 3600 }); // Presigned URL 1시간 유효
+  } catch (error) {
+    console.error("Presigned URL 생성 실패:", error);
+    return null;
   }
-  if (parsedValue < 0) {
-    throw new ValidationError(`${fieldName}는 음수일 수 없습니다.`);
-  }
-  return parsedValue;
 };
 
-export const getReviews = async (cafeId, offset = 0, limit = 10) => {
+// 유효성 검사 함수
+const validateString = (value, fieldName) => {
+  if (typeof value !== "string" || value.trim() === "") {
+    throw new ValidationError(`${fieldName}는 유효한 문자열이어야 합니다.`);
+  }
+  return value.trim();
+};
+
+// 리뷰 조회 서비스
+export const getReviews = async (cafeId, userId = null, offset = 0, limit = 10) => {
   try {
     // 유효성 검사
-    const parsedCafeId = validateNumber(cafeId, "cafeId");
-    const parsedOffset = validateNumber(offset, "offset");
-    const parsedLimit = validateNumber(limit, "limit");
+    const parsedCafeId = Number(cafeId);
+    if (isNaN(parsedCafeId) || parsedCafeId <= 0) {
+      throw new ValidationError("cafeId는 양의 정수여야 합니다.");
+    }
+
+    const parsedUserId = validateString(userId, "userId");
+    const parsedOffset = Number(offset);
+    const parsedLimit = Number(limit);
+
+    if (isNaN(parsedOffset) || parsedOffset < 0) {
+      throw new ValidationError("offset은 0 이상의 숫자여야 합니다.");
+    }
+
+    if (isNaN(parsedLimit) || parsedLimit <= 0) {
+      throw new ValidationError("limit은 1 이상의 숫자여야 합니다.");
+    }
 
     // 리뷰 조회 및 총 개수 가져오기
     const reviews = await fetchReviews(parsedCafeId, parsedOffset, parsedLimit);
@@ -35,6 +74,13 @@ export const getReviews = async (cafeId, offset = 0, limit = 10) => {
     // 리뷰 존재 여부 확인
     if (reviews.length === 0) {
       throw new NotFoundError("해당 카페에 리뷰가 존재하지 않습니다.");
+    }
+
+    // S3 Presigned URL 변환
+    for (const review of reviews) {
+      for (const image of review.images) {
+        image.image_url = await getPresignedUrl(image.image_url);
+      }
     }
 
     const overallRating = overallRatingResult._avg.rating
@@ -62,6 +108,7 @@ export const getReviews = async (cafeId, offset = 0, limit = 10) => {
   }
 };
 
+// 특정 카페의 평점 데이터 조회 서비스
 export const getRatings = async (cafeId) => {
   return await fetchCafeOverallRating(cafeId);
 }

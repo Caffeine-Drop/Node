@@ -11,13 +11,13 @@ dotenv.config();
 3) DB에서 해당 이메일 유저 조회 → 없으면 생성
 4) 유저 정보 + 토큰 반환
  */
-export async function kakaoLoginService(code) {
+export async function kakaoLoginService(code, redirect_uri) {
   const tokenURL = 'https://kauth.kakao.com/oauth/token';
   const data = {
     grant_type: 'authorization_code',
     client_id: process.env.PASSPORT_KAKAO_CLIENT_ID,
     client_secret: process.env.PASSPORT_KAKAO_CLIENT_SECRET,
-    redirect_uri: 'https://auth.expo.io/@m_jin_2/CaffeineDrop', // 프론트엔드 Redirect URI
+    redirect_uri,
     code,
   };
 
