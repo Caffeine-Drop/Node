@@ -1,16 +1,17 @@
 import { createReview } from "../repositories/review_registration_repository.js";
 import { ReviewRegistrationDTO } from "../dtos/review_registration_dto.js";
-import AWS from "aws-sdk";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { ValidationError, InternalServerError } from "../error/error.js";
 
 // AWS S3 설정
-AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const s3 = new S3Client({
     region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
 });
-const s3 = new AWS.S3();
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 
 // S3 이미지 업로드 함수
@@ -18,18 +19,19 @@ const uploadImagesToS3 = async (files) => {
     if (!files || files.length === 0) return [];
 
     try {
-        const uploadPromises = files.map((file) => {
+        const uploadPromises = files.map(async (file) => {
+            const key = `review/${uuidv4()}-${file.originalname}`;
             const params = {
                 Bucket: BUCKET_NAME,
-                Key: `review/${uuidv4()}-${file.originalname}`,
+                Key: key,
                 Body: file.buffer,
                 ContentType: file.mimetype,
             };
-            return s3.upload(params).promise();
+            await s3.send(new PutObjectCommand(params));
+            return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         });
 
-        const uploadResults = await Promise.all(uploadPromises);
-        return uploadResults.map((result) => result.Location);
+        return await Promise.all(uploadPromises);
     } catch (error) {
         console.error("S3 이미지 업로드 실패:", error);
         throw new InternalServerError("이미지 업로드 중 오류가 발생했습니다.");

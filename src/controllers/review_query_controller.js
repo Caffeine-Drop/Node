@@ -4,7 +4,7 @@ export const getReviews = async (req, res) => {
   try {
     // 파라미터 추출
     const { cafeId } = req.params;
-    const { offset = 0, limit = 10 } = req.query;
+    const { offset, limit } = req.query;
 
     // 유효성 검사
     if (!cafeId) {

@@ -46,7 +46,7 @@ const validateString = (value, fieldName) => {
 };
 
 // 리뷰 조회 서비스
-export const getReviews = async (cafeId, userId = null, offset = 0, limit = 10) => {
+export const getReviews = async (cafeId, user_id = null, offset = 0, limit = 10) => {
   try {
     // 유효성 검사
     const parsedCafeId = Number(cafeId);
@@ -54,7 +54,7 @@ export const getReviews = async (cafeId, userId = null, offset = 0, limit = 10) 
       throw new ValidationError("cafeId는 양의 정수여야 합니다.");
     }
 
-    const parsedUserId = validateString(userId, "userId");
+    const parsedUserId = validateString(String(user_id), "userId");
     const parsedOffset = Number(offset);
     const parsedLimit = Number(limit);
 
@@ -83,9 +83,9 @@ export const getReviews = async (cafeId, userId = null, offset = 0, limit = 10) 
       }
     }
 
-    const overallRating = overallRatingResult._avg.rating
+    const overallRating = overallRatingResult._avg && overallRatingResult._avg.rating
     ? parseFloat(overallRatingResult._avg.rating.toFixed(1)) // 평균 별점만 반올림
-    : null;
+    : null;  
 
     // 페이지네이션 정보 계산
     const currentPage = Math.ceil(parsedOffset / parsedLimit) + 1;

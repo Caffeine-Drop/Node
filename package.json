@@ -37,7 +37,8 @@
     "query-string": "^9.1.1",
     "redis": "^4.7.0",
     "seed": "^0.4.4",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
