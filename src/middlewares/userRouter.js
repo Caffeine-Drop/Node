@@ -6,7 +6,7 @@ import { authenticateToken } from './authMiddleware.js';
 const router = express.Router();
 
 // 닉네임 중복 체크 API
-router.get("/nickname/check/", userController.checkNicknameOverlap);
+router.get("/nickname/check/:nickname", userController.checkNicknameOverlap);
 
 // 닉네임 생성 API
 router.post("/nickname", authenticateToken, userController.createNickname);
