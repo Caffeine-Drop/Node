@@ -71,6 +71,71 @@ export async function kakaoLoginService(code, redirect_uri) {
   }
 }
 
+//네이버 로그인 서비스, 비즈니스 로직은 카카오와 동일
+export async function naverLoginService(inputData) {
+  const { code, state, redirect_uri } = inputData;  //분할할당(destructuring)
+
+  const tokenURL = "https://nid.naver.com/oauth2.0/token";
+  const data = {
+    grant_type: "authorization_code",
+    client_id: process.env.PASSPORT_NAVER_CLIENT_ID,
+    client_secret: process.env.PASSPORT_NAVER_CLIENT_SECRET,
+    redirect_uri,
+    code,
+    state, // 네이버는 보안용으로 state를 권장
+  };
+
+  try {
+    //네이버 토큰 엔드포인트로 요청해 accessToken, refreshToken 획득
+    const tokenRes = await axios.post(tokenURL, queryString.stringify(data), {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+    const { access_token, refresh_token } = tokenRes.data;
+
+    //accessToken으로 네이버 프로필 조회
+    const profileRes = await axios.get("https://openapi.naver.com/v1/nid/me", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    // 예시 응답: { "resultcode":"00","message":"success","response":{ "id":"...", "email":"...", "name":"...", "profile_image":"..." } }
+    const { response } = profileRes.data;
+    if (!response) {
+      throw new NotFoundError("네이버 프로필을 가져오지 못했습니다.");
+    }
+
+    const userId = response.id;      // 네이버 회원 id
+    const email = response.email;    // 네이버 이메일
+    if (!userId) {
+      throw new NotFoundError("네이버 프로필에 id가 없습니다.");
+    }
+    if (!email) {
+      throw new NotFoundError("네이버 프로필에 email이 없습니다.");
+    }
+
+    // DB에서 userId로 조회 후 없으면 생성
+    let user = await findByUserId(userId);
+    if (!user) {
+      user = await createUser({
+        user_id: userId,
+        email,
+        email_type: "naver",
+        nickname: response.name || " ",         // name 필드가 있으면 사용
+        profile_image_url: response.profile_image || " ",
+      });
+    }
+
+    // 유저 정보 + 토큰 반환
+    return {
+      id: user.user_id,
+      email: user.email,
+      accessToken: access_token,
+      refreshToken: refresh_token,
+    };
+  } catch (err) {
+    throw new ValidationError('네이버 인증 에러');
+  }
+}
+
 // 네이버 로그아웃 서비스, 직접 기능하기보단 비즈니즈 로직을 담는 함수
 export const logoutServiceNaver = async (accessToken, refreshToken) => {
   try {
