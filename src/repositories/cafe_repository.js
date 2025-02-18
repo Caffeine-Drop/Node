@@ -23,6 +23,7 @@ export class CafeRepository {
               name: true,
               description: true,
               price: true,
+              image_url: true
             },
           },
           operating_hours: {
