@@ -31,8 +31,7 @@ const getPresignedUrl = async (key) => {
 
 /// 특정 카페의 리뷰 목록을 가져오는 레포지토리
 export const getReviews = async (cafeId, offset, limit) => {
-  return prisma.review.findMany({
-
+  const reviews = await prisma.review.findMany({
     where: { cafe_id: Number(cafeId) },
     skip: Number(offset),
     take: Number(limit),
@@ -67,17 +66,23 @@ export const getReviews = async (cafeId, offset, limit) => {
         },
       },
     },
-  }).then(async (reviews) => {
-    // 이미지 Presigned URL 변환
-    for (const review of reviews) {
+  });
+
+  // 이미지 Presigned URL 변환
+  for (const review of reviews) {
+    if (review.images && Array.isArray(review.images) && review.images.length > 0) { 
+      // images가 배열이고 길이가 0 이상일 때만 처리
       for (const image of review.images) {
         if (image.image_url) {
           image.image_url = await getPresignedUrl(image.image_url); // Presigned URL 변환
         }
       }
+    } else {
+      console.log('No images for review:', review.review_id); // 이미지가 없을 경우 로그 추가
     }
-    return reviews;
-  });
+  }
+
+  return reviews;
 };
 
 /// 특정 카페의 총 리뷰 개수를 가져오는 레포지토리

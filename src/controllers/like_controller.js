@@ -14,7 +14,7 @@ class LikeController {
         console.log(user_id, cafe_id);
 
         if (!user_id) {
-            return res.status(400).json({ message: '유저 아이디는 필수이며 숫자여야 합니다.' });
+            return res.status(400).json({ message: '유저 아이디는 필수입니다' });
         }
 
         if (!cafe_id || isNaN(cafe_id)) {
@@ -27,6 +27,32 @@ class LikeController {
                 message: '좋아요 완료', like,
                 user_id : user_id,
                 cafe_id : cafe_id,
+            });
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                return res.status(404).json({ message: error.message });
+            }
+
+            if (error instanceof InternalServerError) {
+                return res.status(500).json({ message: error.message });
+            }
+
+            return res.status(500).json({ message: '알 수 없는 에러', error: error.message });
+        }
+    }
+
+    async myCafe(req, res, next) {
+        const user_id = String(req.user_id);
+
+        if (!user_id) {
+            return res.status(400).json({ message: '유저 아이디는 필수입니다' });
+        }
+
+        try {
+            const mycafe = await service.myLikeCafe(user_id);
+            return res.status(200).json({
+                user_id : user_id,
+                cafeList : mycafe,
             });
         } catch (error) {
             if (error instanceof NotFoundError) {

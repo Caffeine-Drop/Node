@@ -5,11 +5,11 @@ import { CafeFilterDto } from '../dtos/cafeFilter_dto.js';
 
 export const handleFilterCafe = async (req, res) => {
   try {
-    const { dayOfWeek, time, likes, rating } = req.query;
-    console.log('dayOfWeek:', dayOfWeek, 'time:', time, 'likes:', likes);
+    const { dayOfWeek, time, likes, rating, criteria } = req.query;
+    console.log('dayOfWeek:', dayOfWeek, 'time:', time, 'likes:', likes, 'criteria:', criteria);
 
     // CafeFilterDto로 필터링 조건을 생성
-    const filterDto = new CafeFilterDto(dayOfWeek, time, likes, rating);
+    const filterDto = new CafeFilterDto(dayOfWeek, time, likes, rating, criteria);
     console.log('filterdto', filterDto);
 
     const cafeService = new CafeService();

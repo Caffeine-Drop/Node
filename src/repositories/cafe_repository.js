@@ -23,6 +23,29 @@ export class CafeRepository {
               name: true,
               description: true,
               price: true,
+              image_url: true
+            },
+          },
+          operating_hours: {
+            select: {
+              cafe_id: true,
+              day_of_week: true,
+              open_time: true,
+              close_time: true,
+            },
+          },
+          images: {
+            select: {
+              cafe_image_id: true,
+              cafe_id: true,
+              image_url: true,
+              is_thumbnail: true,
+            },
+          },
+          filters: {
+            select: {
+              filter_criteria_id:true,
+              cafe_id:true,
             },
           },
         },

@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 export class CafeRepository {
   static async findCafesByFilters(filters = {}) {
-    const { dayOfWeek, time, likes, rating } = filters;
+    const { dayOfWeek, time, likes, rating, criteria } = filters;
     const whereCondition = {};
 
     if (dayOfWeek || time) {
@@ -21,6 +21,18 @@ export class CafeRepository {
         whereCondition.operating_hours.some.open_time = { lte: kstTime };
         whereCondition.operating_hours.some.close_time = { gte: kstTime };
       }
+    }
+
+    // criteria 조건 적용
+    if (criteria) {
+      whereCondition.filters = {
+        some: {
+          filter_criteria: {
+            name: criteria.trim(),
+          },
+          is_applied: true,
+        },
+      };
     }
 
     // Prisma 쿼리로 리뷰와 평가 데이터를 함께 가져오기
@@ -44,6 +56,18 @@ export class CafeRepository {
             },
           },
         },
+        // criteria가 있을 경우 필터 정보도 포함
+        ...(criteria && {
+          filters: {
+            select: {
+              filter_criteria: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        }),
       },
     });
 

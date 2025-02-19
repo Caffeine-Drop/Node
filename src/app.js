@@ -70,7 +70,7 @@ app.use(cafeBeanMiddleware);
 //카페 정렬 미들웨어
 app.use(cafeSortMiddleware);
 // 리뷰 조회 미들웨어
-app.use(reviewMiddleware);
+app.use('/reviews', reviewMiddleware);
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
