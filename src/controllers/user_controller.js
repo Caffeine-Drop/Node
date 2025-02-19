@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 //검사결과를 응답하기 위한 함수
 export const checkNicknameOverlap = async (req, res) => {
 	try {
-		const nickname = req.params;
+		const { nickname } = req.params;
 		const validNickname = user_dto.checkNicknameDto(nickname);
 		const isNotOverlap = await user_service.checkNicknameOverlap(validNickname); //true(중복아님) or false(중복임)를 리턴
 		return res.success({ isNotOverlap });
