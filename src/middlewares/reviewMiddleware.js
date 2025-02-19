@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/:cafe_id/ratings", getRating);
 
 // 카페별 리뷰 전체 반환
-router.get("/:cafeId", authenticateToken, getReviews);
+router.get("/:cafeId", getReviews);
 
 // 카페 리뷰 등록
 router.post("/:cafeId", authenticateToken, createReviewController);
