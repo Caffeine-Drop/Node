@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import { InternalServerError } from "../error/error.js";
 
@@ -7,7 +7,7 @@ export const createReview = async (reviewData) => {
   const { cafeId, userId, content, evaluations, images } = reviewData;
 
   try {
-    const review = await prisma.$transaction(async (tx) => {
+    const reviewId = await prisma.$transaction(async (tx) => {
       // 1. 리뷰 저장
       const newReview = await tx.review.create({
         data: {
@@ -22,12 +22,11 @@ export const createReview = async (reviewData) => {
         throw new InternalServerError("평점 항목 4개를 모두 입력해야 합니다.");
       }
 
-      // 평가 정보 저장
       await tx.cafeEvaluation.createMany({
         data: evaluations.map((evaluation) => ({
-          review_id: newReview.review_id, // 새 리뷰의 review_id를 사용
-          evaluation_criteria_id: evaluation.criteriaId, // 평점 기준 ID
-          rating: evaluation.rating, // 평점
+          review_id: newReview.review_id,
+          evaluation_criteria_id: evaluation.criteriaId,
+          rating: evaluation.rating,
         })),
       });
 
@@ -35,23 +34,29 @@ export const createReview = async (reviewData) => {
       if (images && images.length > 0) {
         await tx.reviewImage.createMany({
           data: images.map((imageUrl) => ({
-            review_id: newReview.review_id, // 새 리뷰의 review_id를 사용
-            image_url: imageUrl, // 이미지 URL
+            review_id: newReview.review_id,
+            image_url: imageUrl,
           })),
         });
       }
 
-      // 4. 저장된 데이터 함께 반환
-      return tx.review.findUnique({
-        where: { review_id: newReview.review_id },
-        include: {
-          evaluations: true,
-          images: true,
-        },
-      });
+      return newReview.review_id;
     });
 
-    return review;
+    // ✅ 트랜잭션 이후 리뷰 조회
+    const savedReview = await prisma.review.findUnique({
+      where: { review_id: reviewId },
+      include: {
+        evaluations: true,
+        images: true,
+      },
+    });
+
+    if (!savedReview) {
+      throw new InternalServerError("리뷰 데이터를 찾을 수 없습니다.");
+    }
+
+    return savedReview;
   } catch (error) {
     console.error("Error in createReview:", error);
     throw new InternalServerError("리뷰 저장 중 오류가 발생했습니다.");
