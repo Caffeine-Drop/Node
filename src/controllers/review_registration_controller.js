@@ -15,11 +15,6 @@ export const createReviewController = async (req, res) => {
         const content = req.body.content || null;
         const evaluations = req.body.evaluations || [];
 
-        // console.log("Uploaded files:", files.map(file => ({
-        //     originalname: file.originalname,
-        //     mimetype: file.mimetype
-        // })));
-
         // S3 업로드
         const uploadedImages = await uploadImagesToS3(req.files);
         

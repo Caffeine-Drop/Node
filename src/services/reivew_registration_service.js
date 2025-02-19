@@ -11,9 +11,6 @@ export const uploadImagesToS3 = async (files) => {
 
     try {
         const validFiles = files.filter(file => file.mimetype === "image/jpeg");
-        // if (validFiles.length !== files.length) {
-        //     throw new Error("JPEG 형식의 이미지만 지원됩니다.");
-        // }
 
         const uploadPromises = validFiles.map(async (file) => {
             const key = `review/${uuidv4()}-${file.originalname}`;
