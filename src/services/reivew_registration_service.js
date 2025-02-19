@@ -1,8 +1,8 @@
 import { createReview } from "../repositories/review_registration_repository.js";
 import { ReviewRegistrationDTO } from "../dtos/review_registration_dto.js";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import { ValidationError, InternalServerError } from "../error/error.js";
+import { InternalServerError } from "../error/error.js";
 import s3 from "../config/s3client.js";
 
 // S3 이미지 업로드 함수
@@ -10,16 +10,16 @@ export const uploadImagesToS3 = async (files) => {
     if (!files || files.length === 0) return [];
 
     try {
-        const uploadPromises = files.map(async (file) => {
-            if (file.mimetype !== "image/jpeg") {
-                return res
-                    .status(400)
-                    .json({ error: "JPEG 형식의 이미지만 지원됩니다." });
-            }
+        const validFiles = files.filter(file => file.mimetype === "image/jpeg");
+        // if (validFiles.length !== files.length) {
+        //     throw new Error("JPEG 형식의 이미지만 지원됩니다.");
+        // }
+
+        const uploadPromises = validFiles.map(async (file) => {
             const key = `review/${uuidv4()}-${file.originalname}`;
             const params = {
-                Bucket: caffeinedrop,
-                key: key,
+                Bucket: "caffeinedrop",
+                Key: key,
                 Body: file.buffer,
                 ContentType: "image/jpeg",
             };
