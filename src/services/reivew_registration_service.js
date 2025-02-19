@@ -42,13 +42,10 @@ export const registerReview = async (reviewData) => {
             evaluations: typeof reviewData.evaluations === "string"
                 ? JSON.parse(reviewData.evaluations)
                 : reviewData.evaluations,
+            images: reviewData.images,
         });
 
         reviewDTO.validate();
-
-        // S3 이미지 업로드
-        const uploadedImages = await uploadImagesToS3(reviewData.images || []);
-        reviewDTO.images = uploadedImages;
 
         // 리뷰 저장
         return await createReview({
