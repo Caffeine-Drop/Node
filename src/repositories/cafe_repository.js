@@ -41,6 +41,12 @@ export class CafeRepository {
               is_thumbnail: true,
             },
           },
+          filters: {
+            select: {
+              filter_criteria_id:true,
+              cafe_id:true,
+            },
+          },
         },
       });
       console.log('Cafe found:', cafe); // 카페 정보 출력
