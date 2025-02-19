@@ -1,4 +1,3 @@
-import { uploadReviewImages } from "../middlewares/multerMiddleware.js";
 import { registerReview } from "../services/reivew_registration_service.js";
 import util from "util";
 import {
@@ -9,14 +8,8 @@ import {
     InternalServerError,
 } from "../error/error.js";
 
-// multer 미들웨어를 프로미스화
-const uploadReviewImagesAsync = util.promisify(uploadReviewImages);
-
 export const createReviewController = async (req, res) => {
     try {
-        // Multer 미들웨어 실행 (파일 업로드)
-        await uploadReviewImagesAsync(req, res);
-
         const cafeId = Number(req.params.cafeId);
 		const userId = String(req.user_id);
         const content = req.body.content || null;

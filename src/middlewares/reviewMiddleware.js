@@ -2,6 +2,7 @@ import express from "express";
 import { getRating, getReviews } from "../controllers/review_query_controller.js";
 import { authenticateToken } from './authMiddleware.js';
 import { createReviewController } from '../controllers/review_registration_controller.js';
+import { uploadReviewImages } from "../middlewares/multerMiddleware.js";
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ router.get("/:cafe_id/ratings", getRating);
 router.get("/:cafeId", getReviews);
 
 // 카페 리뷰 등록
-router.post("/:cafeId", authenticateToken, createReviewController);
+router.post("/:cafeId", authenticateToken, uploadReviewImages, createReviewController);
 
 export default router;
