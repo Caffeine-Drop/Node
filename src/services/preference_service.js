@@ -42,18 +42,13 @@ export const findPreferredBean = async (userId) => {
 }
 
 // 선호원두 삭제 서비스
-export const deleteUserPreference = async (data) => {
+export const deleteUserPreference = async (user_id) => {
   try {
-    const comfirm = await getPreference(data.prefered_id);
-    if (comfirm === null) {
-      throw new Error.NotFoundError("선호원두를 찾을 수 없습니다.");
-    }
-    if (data.user_id != comfirm.user_id) {
-      throw new Error.ForbiddenError("본인의 선호원두만 삭제할 수 있습니다.");
-    }
-    const result = await deletePreferredBean(data.prefered_id);
+    const preference = (await getPreference(String(user_id))).map((preference) => preference.prefered_id);
+    const result = await deletePreferredBean(preference);
     return result;
   } catch (err) {
+    console.log(err);
     if (err instanceof Error.AppError) {
       throw err;
     } else {

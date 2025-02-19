@@ -11,6 +11,6 @@ router.post("/users/preferred-bean", authenticateToken, handlePreferredBean);
 router.get("/users/preferred-bean", authenticateToken, getPreferredBeanDetail);
 
 // 사용자 선호원두 삭제 API
-router.delete("/users/preferred-bean/:prefered_id", authenticateToken, removePreferredBean);
+router.delete("/users/preferred-bean", authenticateToken, removePreferredBean);
 
 export default router;
