@@ -23,7 +23,7 @@ export const getPreference = async (preferedId) => {
 }
 
 // 선호원두 삭제하는 함수
-export const deletePreferredBean = async (prefered_id) => {
-  const result = await prisma.PreferedUserBean.delete({ where: { prefered_id: prefered_id } });
+export const deletePreferredBean = async (user_id) => {
+  const result = await prisma.PreferedUserBean.deleteMany({ where: { user_id: user_id } });
   return result;
 }

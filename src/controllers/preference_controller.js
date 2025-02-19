@@ -37,7 +37,7 @@ export const getPreferredBeanDetail = async(req, res, next) => {
 // 선호원두 삭제 컨트롤러
 export const removePreferredBean = async(req, res, next) => {
   try {
-    const preferredBean = await deleteUserPreference({user_id: req.user_id,prefered_id: Number(req.params.prefered_id)});
+    const preferredBean = await deleteUserPreference(req.user_id);
     console.log(preferredBean);
     res.status(200).success(preferredBean);
   } catch (err) {
