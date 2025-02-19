@@ -38,7 +38,6 @@ export const getPreferredBeanDetail = async(req, res, next) => {
 export const removePreferredBean = async(req, res, next) => {
   try {
     const preferredBean = await deleteUserPreference(req.user_id);
-    console.log(preferredBean);
     res.status(200).success(preferredBean);
   } catch (err) {
     if(err instanceof Error.NotFoundError){

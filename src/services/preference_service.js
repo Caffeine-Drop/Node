@@ -44,9 +44,11 @@ export const findPreferredBean = async (userId) => {
 // 선호원두 삭제 서비스
 export const deleteUserPreference = async (user_id) => {
   try {
-    const result = await deletePreferredBean(user_id);
+    const preference = (await getPreference(String(user_id))).map((preference) => preference.prefered_id);
+    const result = await deletePreferredBean(preference);
     return result;
   } catch (err) {
+    console.log(err);
     if (err instanceof Error.AppError) {
       throw err;
     } else {
