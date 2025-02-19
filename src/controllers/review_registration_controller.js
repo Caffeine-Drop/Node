@@ -1,4 +1,4 @@
-import { registerReview } from "../services/reivew_registration_service.js";
+import { registerReview, uploadImagesToS3 } from "../services/reivew_registration_service.js";
 import util from "util";
 import {
     ValidationError,
@@ -15,8 +15,8 @@ export const createReviewController = async (req, res) => {
         const content = req.body.content || null;
         const evaluations = req.body.evaluations || [];
 
-        // 업로드된 이미지가 있으면 S3 URL만 저장
-        const uploadedImages = req.files ? req.files.map(file => file.location) : [];
+        // S3 업로드
+        const uploadedImages = await uploadImagesToS3(req.files || []);
         
         const reviewData = {
             cafeId,

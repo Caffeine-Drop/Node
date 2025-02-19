@@ -3,32 +3,28 @@ import { ReviewRegistrationDTO } from "../dtos/review_registration_dto.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { ValidationError, InternalServerError } from "../error/error.js";
-
-// AWS S3 설정
-const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-});
-const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+import s3 from "../config/s3client.js";
 
 // S3 이미지 업로드 함수
-const uploadImagesToS3 = async (files) => {
+export const uploadImagesToS3 = async (files) => {
     if (!files || files.length === 0) return [];
 
     try {
         const uploadPromises = files.map(async (file) => {
+            if (file.mimetype !== "image/jpeg") {
+                return res
+                    .status(400)
+                    .json({ error: "JPEG 형식의 이미지만 지원됩니다." });
+            }
             const key = `review/${uuidv4()}-${file.originalname}`;
             const params = {
-                Bucket: BUCKET_NAME,
-                Key: key,
+                Bucket: caffeinedrop,
+                key: key,
                 Body: file.buffer,
-                ContentType: file.mimetype,
+                ContentType: "image/jpeg",
             };
             await s3.send(new PutObjectCommand(params));
-            return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+            return `https://caffeinedrop.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         });
 
         return await Promise.all(uploadPromises);
