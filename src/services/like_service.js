@@ -51,7 +51,7 @@ class LikeService {
 							reviews: true,
 							likes: true,
 							beans: true,
-							filters: true,
+							filters: { include: { filter_criteria: true } },
 							operating_hours: true,
 						},
 					});
