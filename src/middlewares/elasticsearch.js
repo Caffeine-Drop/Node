@@ -21,7 +21,7 @@ async function checkElasticsearchConnection() {
   }
 }
 
-export default async function syncCafesToElasticsearch() {
+export async function syncCafesToElasticsearch() {
   try {
     await checkElasticsearchConnection();
 
@@ -151,7 +151,7 @@ export default async function syncCafesToElasticsearch() {
 }
 
 // 검색 예시: fuzziness와 edge_ngram을 결합한 검색
-async function searchCafesByKeyword(keyword, lat, lng, radius) {
+export async function searchCafesByKeyword(keyword, lat, lng, radius) {
   const result = await elasticsearchClient.search({
     index: 'cafes',
     body: {
