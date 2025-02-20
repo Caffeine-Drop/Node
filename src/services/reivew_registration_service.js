@@ -10,8 +10,6 @@ export const uploadImagesToS3 = async (files) => {
     if (!files || files.length === 0) return [];
 
     try {
-        const validFiles = files.filter(file => file.mimetype === "image/jpeg");
-
         const uploadPromises = validFiles.map(async (file) => {
             const key = `review/${uuidv4()}-${file.originalname}`;
             const params = {
