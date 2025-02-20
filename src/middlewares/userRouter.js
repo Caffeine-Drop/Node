@@ -22,7 +22,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // 프로필 이미지 등록 및 변경 API
-router.post("/profile-image", authenticateToken, upload.single("file"), userController.uploadProfileImage);
+router.patch("/profile-image", authenticateToken, upload.single("file"), userController.uploadProfileImage);
 
 export default router;
 

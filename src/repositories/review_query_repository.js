@@ -13,13 +13,11 @@ const s3 = new S3Client({
   },
 });
 
-const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
-
 // Presigned URL 생성 함수
 const getPresignedUrl = async (key) => {
   try {
     const command = new GetObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: "caffeinedrop",
       Key: key,
     });
     return await getSignedUrl(s3, command, { expiresIn: 3600 }); // Presigned URL 유효기간 1시간

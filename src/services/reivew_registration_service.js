@@ -1,34 +1,25 @@
 import { createReview } from "../repositories/review_registration_repository.js";
 import { ReviewRegistrationDTO } from "../dtos/review_registration_dto.js";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import { ValidationError, InternalServerError } from "../error/error.js";
-
-// AWS S3 설정
-const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-});
-const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+import { InternalServerError } from "../error/error.js";
+import s3 from "../config/s3client.js";
 
 // S3 이미지 업로드 함수
-const uploadImagesToS3 = async (files) => {
+export const uploadImagesToS3 = async (files) => {
     if (!files || files.length === 0) return [];
 
     try {
         const uploadPromises = files.map(async (file) => {
-            const key = `review/${uuidv4()}-${file.originalname}`;
+            const fileExtension = file.originalname.split('.').pop(); // 확장자 추출
+            const key = `review/${uuidv4()}.${fileExtension}`; // 짧은 UUID 기반 키 사용
             const params = {
-                Bucket: BUCKET_NAME,
+                Bucket: "caffeinedrop",
                 Key: key,
-                Body: file.buffer,
-                ContentType: file.mimetype,
+                Body: file.buffer
             };
             await s3.send(new PutObjectCommand(params));
-            return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+            return `https://caffeinedrop.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
         });
 
         return await Promise.all(uploadPromises);
@@ -49,13 +40,10 @@ export const registerReview = async (reviewData) => {
             evaluations: typeof reviewData.evaluations === "string"
                 ? JSON.parse(reviewData.evaluations)
                 : reviewData.evaluations,
+            images: reviewData.images,
         });
 
         reviewDTO.validate();
-
-        // S3 이미지 업로드
-        const uploadedImages = await uploadImagesToS3(reviewData.images || []);
-        reviewDTO.images = uploadedImages;
 
         // 리뷰 저장
         return await createReview({

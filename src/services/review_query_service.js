@@ -76,13 +76,6 @@ export const getReviews = async (cafeId, user_id = null, offset = 0, limit = 10)
       throw new NotFoundError("해당 카페에 리뷰가 존재하지 않습니다.");
     }
 
-    // S3 Presigned URL 변환
-    for (const review of reviews) {
-      for (const image of review.images) {
-        image.image_url = await getPresignedUrl(image.image_url);
-      }
-    }
-
     const overallRating = overallRatingResult._avg && overallRatingResult._avg.rating
     ? parseFloat(overallRatingResult._avg.rating.toFixed(1)) // 평균 별점만 반올림
     : null;  
