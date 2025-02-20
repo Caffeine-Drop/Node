@@ -5,6 +5,8 @@ import { InternalServerError, NotFoundError } from '../error/error.js';
 export const handleReadCafes = async (req, res, next) => {
   try {
     const cafeId = Number(req.params.cafe_id);
+    console.log("카페 조회", cafeId);
+
     console.log(cafeId);
     // cafeId가 유효한지 체크
     if (isNaN(cafeId)) {

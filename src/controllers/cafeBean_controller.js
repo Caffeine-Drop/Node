@@ -38,6 +38,7 @@ export const getCafeBeansDetails = async (req, res, next) => {
 // 스페셜티 인증 커피 보유여부 컨트롤러
 export const hasSpecialTea = async (req, res, next) => {
   try{
+    console.log("스페셜티 인증 보유 여부");
     const result = await isSpecial(Number(req.params.cafe_id));
     res.status(200).success(result);
   }catch(err){
