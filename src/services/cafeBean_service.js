@@ -68,14 +68,12 @@ export const getAllOfBeans = async (cafe_id) => {
       return { bean: [], single_origin: [], bean_tag: [], cuffingTag: [] }; // 카페가 없으면 빈 값 반환
     }
 
-    const beanIDs = (await getBeansByCafeID(cafe_id))?.map((bean) => bean.bean_id) || [];
-    const singleIDs = (await getSingleOriginID(beanIDs))?.map((single) => single.bean_id) || [];
+    const beanIDs = getBeansByCafeID(cafe_id)?.map((bean) => bean.bean_id) || [];
+    const singleIDs = getSingleOriginID(beanIDs)?.map((single) => single.bean_id) || [];
 
-    const [beansDetail, tagIDs, singleDetails] = await Promise.all([
-      getBeansDetails(beanIDs).catch(() => []),
-      getTagsID(beanIDs).catch(() => []),
-      getSingleOriginDetail(singleIDs).catch(() => [])
-    ]);
+    let beansDetail = getBeansDetails(beanIDs) || [];
+    let tagIDs = getTagsID(beanIDs) || [];
+    let singleDetails = getSingleOriginDetail(singleIDs) || [];
 
     // 각 값이 없으면 빈 배열 반환
     if (beansDetail.length === 0) {
@@ -90,7 +88,7 @@ export const getAllOfBeans = async (cafe_id) => {
       singleDetails = [];
     }
 
-    const cuffingTag = await getTags(tagIDs.map((tag) => tag.cuffing_tag_id)).catch(() => []);
+    let cuffingTag = getTags(tagIDs.map((tag) => tag.cuffing_tag_id)) || [];
     if (cuffingTag.length === 0) {
       cuffingTag = [];
     }
