@@ -1137,21 +1137,21 @@ paths:
             type: string
             enum: [likes, distance]
             default: likes
-          description: 정렬 기준 (기본값: likes)
+            description: 정렬 기준 (기본값: likes)
         - in: query
           name: lat
           schema:
             type: number
             format: float
             example: 37.517236
-          description: 위도 (거리순 정렬 시 필수)
+            description: 위도 (거리순 정렬 시 필수)
         - in: query
           name: lng
           schema:
             type: number
             format: float
             example: 127.047324
-          description: 경도 (거리순 정렬 시 필수)
+            description: 경도 (거리순 정렬 시 필수)
       responses:
         "200":
           description: 정렬된 카페 목록 조회 성공
