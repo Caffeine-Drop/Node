@@ -30,7 +30,9 @@ export const findPreferredBean = async (userId) => {
       throw new Error.NotFoundError("유저를 찾을 수 없습니다.");
     }
     const result = await getPreferredBean(userId)
-
+    if (result.length === 0) {
+      throw new Error.NotFoundError("해당 유저는 아직 선호 원두를 생성하지 않았습니다.");
+    }
     return result;
   } catch (err) {
     if (err instanceof Error.AppError) {
