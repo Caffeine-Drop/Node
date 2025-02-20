@@ -12,7 +12,7 @@ export const getBean = async (beanId) => {
 
 // 원두 정보 조회 함수 (원두아이디들로 다중조회)
 export const getBeansDetails = async (beanIds) => {
-  const beans = await prisma.Bean.findMany({ where: { bean_id: { in: beanIds } } });
+  const beans = await prisma.bean.findMany({ where: { bean_id: { in: beanIds } } });
   return beans;
 }
 
