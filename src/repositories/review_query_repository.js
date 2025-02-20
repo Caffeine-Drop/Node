@@ -66,20 +66,6 @@ export const getReviews = async (cafeId, offset, limit) => {
     },
   });
 
-  // 이미지 Presigned URL 변환
-  for (const review of reviews) {
-    if (review.images && Array.isArray(review.images) && review.images.length > 0) { 
-      // images가 배열이고 길이가 0 이상일 때만 처리
-      for (const image of review.images) {
-        if (image.image_url) {
-          image.image_url = await getPresignedUrl(image.image_url); // Presigned URL 변환
-        }
-      }
-    } else {
-      console.log('No images for review:', review.review_id); // 이미지가 없을 경우 로그 추가
-    }
-  }
-
   return reviews;
 };
 
