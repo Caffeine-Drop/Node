@@ -14,7 +14,6 @@ export const createReviewController = async (req, res) => {
 		const userId = String(req.user_id);
         const content = req.body.content || null;
         const evaluations = req.body.evaluations || [];
-        console.log("카페 리뷰 반환", cafeId);
 
         // S3 업로드
         const uploadedImages = await uploadImagesToS3(req.files);

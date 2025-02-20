@@ -5,6 +5,7 @@ export const getReviews = async (req, res) => {
     // 파라미터 추출
     const { cafeId } = req.params;
     const { offset, limit } = req.query;
+    console.log("카페 리뷰 반환", cafeId);
 
     // 유효성 검사
     if (!cafeId) {
@@ -50,7 +51,7 @@ export const getReviews = async (req, res) => {
 
 export const getRating = async (req, res) => {
   try {
-    console.log("카페 평점 반환", cafeId);
+    console.log("카페 평점 반환");
     const cafe_id = Number(req.params.cafe_id);
     if (!cafe_id) {
       return res.status(400).json({ message: '카페 아이디는 필수입니다.' });
