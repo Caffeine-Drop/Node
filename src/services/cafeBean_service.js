@@ -65,7 +65,7 @@ export const getAllOfBeans = async (cafe_id) => {
   try {
     const comfirm = await getCafe(cafe_id);
     if (!comfirm) {
-      throw new Error.NotFoundError("카페를 찾을 수 없습니다.");
+      return { bean: [], single_origin: [], bean_tag: [], cuffingTag: [] }; // 카페가 없으면 빈 값 반환
     }
 
     const beanIDs = (await getBeansByCafeID(cafe_id))?.map((bean) => bean.bean_id) || [];
@@ -77,33 +77,29 @@ export const getAllOfBeans = async (cafe_id) => {
       getSingleOriginDetail(singleIDs).catch(() => [])
     ]);
 
-    if (!beansDetail || beansDetail.length === 0) {
-      throw new Error.NotFoundError("보유 원두의 상세 정보를 찾을 수 없습니다.");
+    // 각 값이 없으면 빈 배열 반환
+    if (beansDetail.length === 0) {
+      beansDetail = [];
     }
 
-    if (!tagIDs || tagIDs.length === 0) {
-      throw new Error.NotFoundError("태그 정보를 찾을 수 없습니다.");
+    if (tagIDs.length === 0) {
+      tagIDs = [];
     }
 
-    if (!singleDetails || singleDetails.length === 0) {
-      throw new Error.NotFoundError("싱글 오리진 원두 정보를 찾을 수 없습니다.");
+    if (singleDetails.length === 0) {
+      singleDetails = [];
     }
 
-    const cuffingTag = await getTags(tagIDs.map((tag) => tag.cuffing_tag_id));
-    if (!cuffingTag || cuffingTag.length === 0) {
-      throw new Error.NotFoundError("커핑 태그를 찾을 수 없습니다.");
+    const cuffingTag = await getTags(tagIDs.map((tag) => tag.cuffing_tag_id)).catch(() => []);
+    if (cuffingTag.length === 0) {
+      cuffingTag = [];
     }
 
     return { bean: beansDetail, single_origin: singleDetails, bean_tag: tagIDs, cuffingTag };
   } catch (err) {
-    if (err instanceof Error.AppError) {
-      throw err;
-    } else {
-      throw new Error.InternalServerError();
-    }
+    return { bean: [], single_origin: [], bean_tag: [], cuffingTag: [] }; // 예외 발생 시 빈 값 반환
   }
 };
-
 
 // 스페셜티 인증 커피 보유여부 서비스
 export const isSpecial = async (cafe_id) => {
