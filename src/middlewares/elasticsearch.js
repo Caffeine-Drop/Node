@@ -57,9 +57,18 @@ export default async function syncCafesToElasticsearch() {
                 name: {
                   type: 'text',
                   analyzer: 'edge_ngram_analyzer',
+                  search_analyzer: 'edge_ngram_analyzer',
                 },
-                menu_items: { type: 'text' },
-                address: { type: 'text' },
+                menu_items: {
+                  type: 'text',
+                  analyzer: 'edge_ngram_analyzer',
+                  search_analyzer: 'edge_ngram_analyzer',
+                },
+                address: {
+                  type: 'text',
+                  analyzer: 'edge_ngram_analyzer',
+                  search_analyzer: 'edge_ngram_analyzer',
+                },
                 location: { type: 'geo_point' },
               },
             },
@@ -83,7 +92,11 @@ export default async function syncCafesToElasticsearch() {
     }
 
     // MySQL에서 모든 카페 데이터 가져오기
-    const cafes = await prisma.cafe.findMany();
+    const cafes = await prisma.cafe.findMany({
+      include: {
+        menu_items: true,  // 메뉴 아이템도 함께 가져오기
+      },
+    });
     console.log('가져온 카페 데이터:', cafes);
 
     if (cafes.length === 0) {
@@ -98,17 +111,23 @@ export default async function syncCafesToElasticsearch() {
         continue;
       }
 
+      const location = {
+        lat: cafe.latitude,
+        lon: cafe.longitude,
+      };
+
+      // menu_items가 없으면 빈 배열로 처리
+      const menuItems = Array.isArray(cafe.menu_items) ? cafe.menu_items : [];
+
+      // menu_items가 있다면 각 항목에서 'name'만 추출
+      const menuItemNames = menuItems.map(item => item.name).filter(name => name);
+
       try {
         // 문서가 이미 존재하면 update, 없으면 insert
         const existingDoc = await elasticsearchClient.exists({
           index: 'cafes',
           id: cafe.cafe_id.toString(),
         });
-
-        const location = {
-          lat: cafe.latitude,
-          lon: cafe.longitude,
-        };
 
         if (existingDoc.body) {
           // 문서가 이미 존재하면 update
@@ -118,7 +137,7 @@ export default async function syncCafesToElasticsearch() {
             body: {
               doc: {
                 name: cafe.name,
-                menu_items: cafe.menu_items,
+                menu_items: menuItemNames, // 메뉴 이름만 추출하여 저장
                 address: cafe.address,
                 location: location,  // location 필드 업데이트
               },
@@ -132,7 +151,7 @@ export default async function syncCafesToElasticsearch() {
             id: cafe.cafe_id.toString(),
             body: {
               name: cafe.name,
-              menu_items: cafe.menu_items,
+              menu_items: menuItemNames, // 메뉴 이름만 추출하여 저장
               address: cafe.address,
               location: location,  // location 필드 삽입
             },
@@ -148,37 +167,4 @@ export default async function syncCafesToElasticsearch() {
   } catch (error) {
     console.error('엘라스틱서치 동기화 중 에러:', error);
   }
-}
-
-// 검색 예시: fuzziness와 edge_ngram을 결합한 검색
-async function searchCafesByKeyword(keyword, lat, lng, radius) {
-  const result = await elasticsearchClient.search({
-    index: 'cafes',
-    body: {
-      query: {
-        bool: {
-          must: [
-            {
-              multi_match: {
-                query: keyword,
-                fields: ['name', 'menu_items', 'address'],
-                fuzziness: 'AUTO',  // fuzzy 검색
-              },
-            },
-          ],
-          filter: {
-            geo_distance: {
-              distance: `${radius}km`,
-              location: {
-                lat: parseFloat(lat),
-                lon: parseFloat(lng),
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  return result.body.hits.hits;
 }

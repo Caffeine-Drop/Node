@@ -81,7 +81,9 @@ class SearchRepository {
                 multi_match: {
                   query: keyword,
                   fields: ['name', 'menu_items', 'address'],
-                  fuzziness: 'AUTO',
+                  fuzziness: 1,
+                  type: 'most_fields',
+                  operator: 'or'
                 },
               },
             ],
