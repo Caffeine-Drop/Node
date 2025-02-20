@@ -692,7 +692,7 @@ paths:
                   error:
                     type: string
                     example: "서버 에러 발생"
-  /cafes/{cafe_id}:
+  /like/cafes/{cafe_id}:
     post:
       tags:
         - Cafe Likes
@@ -770,7 +770,7 @@ paths:
                     type: string
                     example: "서버 에러"
 
-  /cafes:
+  /like/cafes:
     get:
       tags:
         - Cafe Likes
