@@ -9,7 +9,12 @@ export const addCafeBean = async (data) => {
 
 // 카페_원두 조회 함수 (카페아이디, 원두아이디로 단일조회)
 export const getCafeBeanByKey = async (data) => {
-  const cafeBean = await prisma.cafeBean.findFirst({ where: { cafe_id: data.cafe_id, bean_id: data.bean_id } });
+  const cafeBean = await prisma.cafeBean.findFirst({
+    where: { cafe_id: data.cafe_id, bean_id: data.bean_id },
+    include: {
+      cafe: true,  // 카페 정보도 함께 가져오기
+      bean: true   // 원두 정보도 함께 가져오기
+    } });
   if (!cafeBean) {
     return null;
   }
