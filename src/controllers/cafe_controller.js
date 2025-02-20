@@ -4,7 +4,7 @@ import { InternalServerError, NotFoundError } from '../error/error.js';
 
 export const handleReadCafes = async (req, res, next) => {
   try {
-    const cafeId = parseInt(req.params.cafe_id);
+    const cafeId = Number(req.params.cafe_id);
     console.log(cafeId);
     // cafeId가 유효한지 체크
     if (isNaN(cafeId)) {
