@@ -1137,7 +1137,7 @@ paths:
             type: string
             enum: ["likes", "distance"]
             default: "likes"
-          description: 정렬 기준 (기본값: likes)
+          description: 정렬 기준 (기본값 likes)
         - in: query
           name: lat
           schema:
