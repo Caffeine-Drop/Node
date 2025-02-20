@@ -74,7 +74,7 @@ model MenuItem {
 
 model Bean {
   bean_id            Int               @id @default(autoincrement())
-  roasting           Roasting          @relation(fields: [roasting_id], references: [roasting_id])
+  roasting           Roasting?         @relation(fields: [roasting_id], references: [roasting_id])
   roasting_id        Int?
   name               String
   is_specialty       Boolean?          @default(false)
