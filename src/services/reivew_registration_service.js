@@ -15,8 +15,7 @@ export const uploadImagesToS3 = async (files) => {
             const params = {
                 Bucket: "caffeinedrop",
                 Key: key,
-                Body: file.buffer,
-                ContentType: "image/jpeg",
+                Body: file.buffer
             };
             await s3.send(new PutObjectCommand(params));
             return `https://caffeinedrop.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
