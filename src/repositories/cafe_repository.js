@@ -40,6 +40,7 @@ export class CafeRepository {
               cafe_id: true,
               image_url: true,
               is_thumbnail: true,
+              is_menu: true
             },
           },
           filters: {
