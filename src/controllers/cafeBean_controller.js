@@ -22,6 +22,7 @@ export const handleCafeBean = async (req, res, next) => {
 // 카페 원두 상세조회(전체) 컨트롤러
 export const getCafeBeansDetails = async (req, res, next) => {
   try{
+    console.log("카페 원두 조회")
     const beans = await getAllOfBeans(Number(req.params.cafe_id));
     res.status(200).success(beans);
   }catch(err){
