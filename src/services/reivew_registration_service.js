@@ -11,7 +11,8 @@ export const uploadImagesToS3 = async (files) => {
 
     try {
         const uploadPromises = files.map(async (file) => {
-            const key = `review/${uuidv4()}-${file.originalname}`;
+            const fileExtension = file.originalname.split('.').pop(); // 확장자 추출
+            const key = `review/${uuidv4()}.${fileExtension}`; // 짧은 UUID 기반 키 사용
             const params = {
                 Bucket: "caffeinedrop",
                 Key: key,
